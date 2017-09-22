@@ -1,0 +1,23 @@
+{
+  "name": "nettime",
+  "version": "0.0.1",
+  "description": "nettime remote control",
+  "main": "dist/nettime.js",
+  "bin" : {
+    "nettime": "dist/cli.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "compile": "tsc"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/commander": "^2.9.2",
+    "@types/node": "^8.0.28",
+    "typescript": "^2.5.2"
+  },
+  "dependencies": {
+    "commander": "^2.11.0"
+  }
+}
