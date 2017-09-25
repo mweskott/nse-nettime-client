@@ -1,5 +1,5 @@
 import { Nettime } from "./nettime";
-import { ProjectNumber } from "./project-number";
+import { TaskNumber } from "./task-number";
 const querystring = require('querystring');
 import fs = require('fs');
 
@@ -40,13 +40,12 @@ export class ZeitkontierungPage {
         console.log("=================================================================");
         console.log("aktualisieren");
 
-        let projectNumber = new ProjectNumber(target);
-        let project = projectNumber.getProject();
+        let taskNumber = new TaskNumber(target);
 
         var data = querystring.stringify({
             "F_Aktual": "Aktualisieren",
 
-            "F_PId": project,
+            "F_PId": taskNumber.getProject(),
         });
 
         return new Promise<ZeitkontierungPage>((resolve, reject) => {
@@ -62,16 +61,14 @@ export class ZeitkontierungPage {
         console.log("=================================================================");
         console.log("speichern");
 
-        let targetNumber = new ProjectNumber(target);
-        let targetProject = targetNumber.getProject();
-        let targetWorkItem = targetNumber.getWorkItem();
+        let taskNumber = new TaskNumber(target);
 
         var data = querystring.stringify({
             "F_Speichern": "Speichern",
 
-            "F_PId": targetProject,
-            "F_ThId": targetWorkItem,
-            "F_KAId": target,
+            "F_PId": taskNumber.getProject(),
+            "F_ThId": taskNumber.getSubject(),
+            "F_KAId": taskNumber.getTask(),
 
             "F_VonDat": date,
             "F_VonZeit": timeStart,

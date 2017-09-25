@@ -12,7 +12,7 @@
     "url": "https://github.com/mweskott/nse-nettime-client.git"
   },
   "scripts": {
-    "test": "mocha",
+    "test": "npm run compile | mocha dist",
     "compile": "tsc"
   },
   "author": "",
