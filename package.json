@@ -2,7 +2,8 @@
   "name": "nettime",
   "version": "0.0.1",
   "description": "nettime remote control",
-  "main": "dist/nettime.js",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "bin": {
     "nettime": "dist/cli.js"
   },
@@ -11,14 +12,16 @@
     "url": "https://github.com/mweskott/nse-nettime-client.git"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "mocha",
     "compile": "tsc"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "@types/commander": "^2.9.2",
+    "@types/mocha": "^2.2.43",
     "@types/node": "^8.0.28",
+    "mocha": "^3.5.3",
     "typescript": "^2.5.2"
   },
   "dependencies": {

@@ -7,7 +7,7 @@ import fs = require('fs');
 
 
 
-class RequestResult {
+export class RequestResult {
   public message: http.IncomingMessage;
   public data: string;
 }
@@ -33,8 +33,9 @@ export class Nettime {
         });
     return new Promise<Nettime>((resolve, reject) => {
       this.post("/asp/nt_anmeldung.asp?ProgId=0", data).then((res) => {
-        fs.writeFile("login.html", res.data, null, null);
-        resolve(this);
+        fs.writeFile("login.html", res.data, null, () => {
+          resolve(this);
+        });
       });
     });
   }

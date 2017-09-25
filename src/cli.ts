@@ -29,7 +29,7 @@ program
         console.log("login then", result);
 
         let bookingPage = new ZeitkontierungPage(result);
-        bookingPage.buchen().then((page) => {
+        bookingPage.buchen(number, date, timeStart, timeEnd).then((page) => {
           console.log("... gebucht");
         });
       });
