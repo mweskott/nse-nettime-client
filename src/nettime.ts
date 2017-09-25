@@ -52,7 +52,7 @@ export class Nettime {
     });
   }
 
-  private get(path: string): Promise<RequestResult> {
+  public get(path: string): Promise<RequestResult> {
 
     let url = new URL(this.url);
     return new Promise<RequestResult>((resolve, reject) => {
@@ -60,7 +60,8 @@ export class Nettime {
         hostname: url.hostname,
         port: url.port,
         path: path,
-        method: 'GET'
+        method: 'GET',
+        headers: {}
       };
       if (this.sessionCookie) {
         options.headers["Cookie"] = this.sessionCookie;
@@ -82,7 +83,7 @@ export class Nettime {
     });
   }
 
-  private post(path: string, data: string): Promise<RequestResult> {
+  public post(path: string, data: string): Promise<RequestResult> {
     return new Promise<RequestResult>((resolve, reject) => {
       let url = new URL(this.url);
       let options: http.RequestOptions = {
