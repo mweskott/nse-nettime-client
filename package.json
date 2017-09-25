@@ -13,7 +13,8 @@
   },
   "scripts": {
     "test": "npm run compile | mocha dist",
-    "compile": "tsc"
+    "compile": "tsc && npm run assets",
+    "assets":   "cp src/config.json dist/"
   },
   "author": "",
   "license": "ISC",
