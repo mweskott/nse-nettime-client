@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 import * as program from "commander";
 import { Nettime } from "./nettime";
 import { ZeitkontierungPage } from "./zeitkontierung-page";
