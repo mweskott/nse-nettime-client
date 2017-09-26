@@ -12,9 +12,8 @@
     "url": "https://github.com/mweskott/nse-nettime-client.git"
   },
   "scripts": {
-    "test": "npm run compile | mocha dist",
-    "compile": "tsc && npm run assets",
-    "assets":   "cp src/config.json dist/"
+    "test": "npm run compile && mocha dist",
+    "compile": "tsc"
   },
   "author": "",
   "license": "ISC",
