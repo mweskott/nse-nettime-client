@@ -2,6 +2,7 @@ import * as program from "commander";
 import { Nettime } from "./nettime";
 import { ZeitkontierungPage } from "./zeitkontierung-page";
 import fs = require('fs');
+import * as readline from 'readline';
 
 class Configuration {
   url: string;
@@ -16,9 +17,9 @@ program
   .option('-c, --config <configFile>', 'Configuration file');
 
 program
-  .command('book [number] [date] [timeStart] [timeEnd]')
+  .command('book [task] [date] [timeStart] [timeEnd]')
   .description('submit booking')
-  .action((number: string, date: string, timeStart: string, timeEnd: string) => {
+  .action((task: string, date: string, timeStart: string, timeEnd: string) => {
 
     let cfg = new Configuration();
     if (program.config) {
@@ -26,31 +27,60 @@ program
       cfg = JSON.parse(contents.toString());
     }
 
-    let url = program.url || cfg.url;
-    let user = program.user || cfg.username;
-    let password = program.password || cfg.password;
+    cfg.url = program.url || cfg.url;
+    cfg.username = program.user || cfg.username;
+    cfg.password = program.password || cfg.password;
 
-    console.log("book", url, user, password);
-    console.log("book", number, date, timeStart, timeEnd);
+    console.log("config", cfg);
+    console.log("parameter", task, date, timeStart, timeEnd);
 
-    let nettime = new Nettime(url);
-    if(!!number && !!date && !!timeStart && !!timeEnd) {
+    let booker = new BookingCommand();
+    booker.config = cfg;
+    booker.task = task;
+    booker.date = date;
+    booker.timeStart = timeStart;
+    booker.timeEnd = timeEnd;
+
+    if (!booker.config.password) {
+      let rl = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout
+      });
+
+      rl.question('Enter your nettime password? ', (answer) => {
+        rl.close();
+        booker.config.password = answer;
+        booker.makeBooking();
+      });
+    } else {
+      booker.makeBooking();
+    }
+  });
+
+class BookingCommand {
+  public config: Configuration;
+  public task: string;
+  public date: string;
+  public timeStart: string;
+  public timeEnd: string;
+
+  public makeBooking() {
+    let nettime = new Nettime(this.config.url);
+    if(!!this.task && !!this.date && !!this.timeStart && !!this.timeEnd) {
       nettime.contact().then(result => {
         console.log("contact then", result);
-        result.login(user, password).then(result => {
+        result.login(this.config.username, this.config.password).then(result => {
           console.log("login then", result);
 
           let bookingPage = new ZeitkontierungPage(result);
-          bookingPage.buchen(number, date, timeStart, timeEnd).then((page) => {
+          bookingPage.buchen(this.task, this.date, this.timeStart, this.timeEnd).then((page) => {
             console.log("... gebucht");
           });
         });
       });
     }
-
-
-  });
-
+  }
+}
 
 program
   .command("test")

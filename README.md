@@ -12,7 +12,7 @@ Unofficial client for the NSE time recording tool powered by node.js.
 Use `nettime --help` to list all commands and options.
 
 * `--url <url>` Nettime server URL
-* `-u, --user <login> User login
+* `-u, --user <login>` User login
 * `-p, --password <password>` Password
 * `-c, --config <configFile>` loads the given config file (in json format) to define command line parameters
 
