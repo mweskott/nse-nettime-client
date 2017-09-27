@@ -5,14 +5,18 @@ import querystring = require('querystring');
 import fs = require('fs');
 
 
+export class OperationResult {
+  error: string;
 
+  constructor(error?: string) {
+    this.error = error;
+  }
+}
 
 export class RequestResult {
   public message: http.IncomingMessage;
   public data: string;
 }
-
-
 
 export class Nettime {
 
@@ -21,7 +25,21 @@ export class Nettime {
   constructor(public url: string)  {
   }
 
-  public login(user: string, password: string): Promise<Nettime> {
+  public contact(): Promise<OperationResult> {
+    console.log("=================================================================");
+    console.log("contact");
+
+    return new Promise<OperationResult>((resolve, reject) => {
+      this.get("/").then((res) => {
+        this.sessionCookie = <string[]>res.message.headers["set-cookie"];
+        resolve(new OperationResult());
+      }).catch((result) => {
+        reject(new OperationResult("contact failed"));
+      })
+    });
+  }
+
+  public login(user: string, password: string): Promise<OperationResult> {
     console.log("=================================================================");
     console.log("login");
 
@@ -31,35 +49,26 @@ export class Nettime {
       "F_Passwort": password,
       "F_UNr": user
     };
-    return new Promise<Nettime>((resolve, reject) => {
-      this.post("/asp/nt_anmeldung.asp?ProgId=0", data).then((res) => {
-        fs.writeFile("login.html", res.data, null, () => {
-          resolve(this);
-        });
+    return new Promise<OperationResult>((resolve, reject) => {
+      this.post("/asp/nt_anmeldung.asp?ProgId=0", data).then((result) => {
+        fs.writeFileSync("login.html", result.data);
+        
+        if (result.data.includes("fehlgeschlagen")) {
+          reject(new OperationResult("login failed"));
+        } else {
+          resolve(new OperationResult());
+        }
       });
     });
   }
 
-
-  public contact(): Promise<Nettime> {
-    console.log("=================================================================");
-    console.log("contact");
-
-    return new Promise<Nettime>((resolve, reject) => {
-      this.get("/").then((res) => {
-        this.sessionCookie = <string[]>res.message.headers["set-cookie"];
-        resolve(this);
-      });
-    });
-  }
-
-  public logout(): Promise<Nettime> {
+  public logout(): Promise<OperationResult> {
     console.log("=================================================================");
     console.log("logout");
 
-    return new Promise<Nettime>((resolve, reject) => {
+    return new Promise<OperationResult>((resolve, reject) => {
       this.get("/asp/nt_abmelden.asp").then((res) => {
-        resolve(this);
+        resolve(new OperationResult());
       });
     });
   }
@@ -131,5 +140,4 @@ export class Nettime {
       req.end();
     });
   }
-
 }

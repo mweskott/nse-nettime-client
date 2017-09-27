@@ -20,11 +20,12 @@ Use `nettime --help` to list all commands and options.
 
 ### Configuration files
 
-To define static options, you can  provide a configuration file in json format.
+To define static options, you can provide a configuration file in json format.
+If no configuration file is given, the command tries to load the file `nettime.json`.
 
 ```javascript
 {
-  "username": "mynettimeuser",
+  "user": "mynettimeuser",
   "url": "https://nettime.example.org",
   "alias": {
     "pfefferminzia.cosulting": "225487.01.15.02",

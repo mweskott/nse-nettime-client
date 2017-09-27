@@ -1,12 +1,8 @@
-import { Nettime } from "./nettime";
+import { Nettime, OperationResult } from "./nettime";
 import { TaskNumber } from "./task-number";
 const querystring = require('querystring');
 import fs = require('fs');
 
-
-export class OperationResult {
-    error: string;
-}
 
 
 export class ZeitkontierungPage {

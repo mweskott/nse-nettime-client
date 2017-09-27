@@ -34,7 +34,7 @@ build/Release
 dist
 *.html
 src/config.json
-myconfig.json
+nettime.json
 
 # Dependency directories
 node_modules/
