@@ -11,10 +11,36 @@ Unofficial client for the NSE time recording tool powered by node.js.
 
 Use `nettime --help` to list all commands and options.
 
+### Command line options
+
 * `--url <url>` Nettime server URL
 * `-u, --user <login>` User login
 * `-p, --password <password>` Password
 * `-c, --config <configFile>` loads the given config file (in json format) to define command line parameters
+
+### Configuration files
+
+To define static options, you can  provide a configuration file in json format.
+
+```
+{
+  "username": "mynettimeuser",
+  "url": "https://nettime.example.org",
+  "alias": {
+    "pfefferminzia.cosulting": "225487.01.15.02",
+    "pfefferminzia.aiting": "345487.01.15.17"
+  }
+}
+```
+
+### Task number aliases
+
+Task numbers are sometimes a bit inconvenient.
+To improve booking performance you can define task number alieses as strings and use them in booking command.
+
+> nettime -c myconfig.json book pfefferminzia.cosulting 08:00 16:00
+
+You hafe to define task number aliases in the configuration file.
 
 ## API
 [TBD]

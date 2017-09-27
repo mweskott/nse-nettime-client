@@ -4,6 +4,9 @@ const querystring = require('querystring');
 import fs = require('fs');
 
 
+export class OperationResult {
+    error: string;
+}
 
 
 export class ZeitkontierungPage {
@@ -11,12 +14,16 @@ export class ZeitkontierungPage {
     constructor(public nettime: Nettime) {
     }
 
-    public buchen(target: string, date: string, timeStart: string, timeEnd: string) : Promise<ZeitkontierungPage> {
-        return new Promise<ZeitkontierungPage>((resolve, reject) => {
+    public buchen(target: string, date: string, timeStart: string, timeEnd: string) : Promise<OperationResult> {
+        return new Promise<OperationResult>((resolve, reject) => {
             this.ansicht().then((bookingPage) => {
                 bookingPage.aktualisieren(target).then((bookingPage) => {
-                    bookingPage.speichern(target, date, timeStart, timeEnd).then((bookingPage) => {
-                        resolve(this);
+                    bookingPage.speichern(target, date, timeStart, timeEnd).then((htmlResponse) => {
+                        if (htmlResponse.includes(" Eingabe in Nummernfeld!"))
+                            reject({error: "Ungültige Eingabe in Nummernfeld!"});
+                        if (htmlResponse.includes("sich mit einer bereits erfassten Zeit!"))
+                            reject({error: "Die eingegebene Zeit überschneidet sich mit einer bereits erfassten Zeit!"});
+                        resolve(<OperationResult>{});
                     })
                 })
             })
@@ -57,7 +64,7 @@ export class ZeitkontierungPage {
         });
     }
 
-    public speichern(target: string, date: string, timeStart: string, timeEnd: string) : Promise<ZeitkontierungPage> {
+    public speichern(target: string, date: string, timeStart: string, timeEnd: string) : Promise<string> {
         console.log("=================================================================");
         console.log("speichern");
 
@@ -79,10 +86,10 @@ export class ZeitkontierungPage {
             // "F_BisPause": "13:00",
         });
 
-        return new Promise<ZeitkontierungPage>((resolve, reject) => {
+        return new Promise<string>((resolve, reject) => {
             this.nettime.post("/asp/nt_zeitkontierung.asp", data).then((res) => {
               fs.writeFile("speichern.html", res.data, null, () => {
-                resolve(this);
+                resolve(res.data);
               });
             });
         });
