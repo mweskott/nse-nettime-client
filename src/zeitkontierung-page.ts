@@ -15,11 +15,14 @@ export class ZeitkontierungPage {
             this.ansicht().then((bookingPage) => {
                 bookingPage.aktualisieren(target).then((bookingPage) => {
                     bookingPage.speichern(target, date, timeStart, timeEnd).then((htmlResponse) => {
+                        if (htmlResponse.includes("Ihre Eingaben wurden erfolgreich gespeichert.")) {
+                            resolve(<OperationResult>{});
+                        }
                         if (htmlResponse.includes(" Eingabe in Nummernfeld!"))
                             reject({error: "Ungültige Eingabe in Nummernfeld!"});
                         if (htmlResponse.includes("sich mit einer bereits erfassten Zeit!"))
                             reject({error: "Die eingegebene Zeit überschneidet sich mit einer bereits erfassten Zeit!"});
-                        resolve(<OperationResult>{});
+                        reject({error: "unknown error"});
                     })
                 })
             })

@@ -104,14 +104,13 @@ program
   .command('book [task] [date] [timeStart] [timeEnd]')
   .description('submit booking')
   .action((task: string, date: string, timeStart: string, timeEnd: string) => {
-    let cfg = Configuration.createConfigurationFromFile(program.config);
-
-    cfg.url = program.url || cfg.url;
-    cfg.user = program.user || cfg.user;
-    cfg.password = program.password || cfg.password;
+    let config = Configuration.createConfigurationFromFile(program.config);
+    config.url = program.url || config.url;
+    config.user = program.user || config.user;
+    config.password = program.password || config.password;
 
     let booking = new Booking();
-    booking.config = cfg;
+    booking.config = config;
     booking.task = task;
     booking.date = date;
     booking.timeStart = timeStart;
