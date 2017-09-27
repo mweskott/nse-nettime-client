@@ -53,6 +53,18 @@ export class Nettime {
     });
   }
 
+  public logout(): Promise<Nettime> {
+    console.log("=================================================================");
+    console.log("logout");
+
+    return new Promise<Nettime>((resolve, reject) => {
+      this.get("/asp/nt_abmelden.asp").then((res) => {
+        resolve(this);
+      });
+    });
+  }
+
+
   public get(path: string): Promise<RequestResult> {
 
     let url = new URL(this.url);

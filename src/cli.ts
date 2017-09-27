@@ -7,7 +7,7 @@ import fs = require('fs');
 import * as readline from 'readline';
 
 class Alias {
-    [header: string]: string;
+  [header: string]: string;
 }
 
 class Configuration {
@@ -39,21 +39,19 @@ class BookingCommand {
   public timeStart: string;
   public timeEnd: string;
 
-  public makeBooking() {
+  public async makeBooking() {
     let nettime = new Nettime(this.config.url);
     if (!!this.task && !!this.date && !!this.timeStart && !!this.timeEnd) {
-      nettime.contact().then(result => {
-        result.login(this.config.username, this.config.password).then(result => {
-          let bookingPage = new ZeitkontierungPage(result);
-          bookingPage.buchen(this.task, this.date, this.timeStart, this.timeEnd)
-            .then((result) => {
-              console.log("... booked");
-            })
-            .catch((result) => {
-              console.log("... error", result.error);
-            })
-        });
-      });
+      await nettime.contact();
+      await nettime.login(this.config.username, this.config.password);
+      let bookingPage = new ZeitkontierungPage(nettime);
+      try {
+        let boolingResult = await bookingPage.buchen(this.task, this.date, this.timeStart, this.timeEnd);
+        console.log("... bookead");
+      }
+      catch(bookingError) {
+        console.log("... error", bookingError);
+      }
     }
   }
 }
@@ -110,7 +108,7 @@ program
     if (cfg.alias) {
       Object.keys(cfg.alias).forEach((name) => {
         console.log(name, cfg.alias[name]);
-    });
+      });
     }
   });
 
