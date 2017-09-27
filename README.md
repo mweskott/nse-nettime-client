@@ -22,7 +22,7 @@ Use `nettime --help` to list all commands and options.
 
 To define static options, you can  provide a configuration file in json format.
 
-```
+```javascript
 {
   "username": "mynettimeuser",
   "url": "https://nettime.example.org",
@@ -36,11 +36,11 @@ To define static options, you can  provide a configuration file in json format.
 ### Task number aliases
 
 Task numbers are sometimes a bit inconvenient.
-To improve booking performance you can define task number alieses as strings and use them in booking command.
+To improve booking performance you can define task number alieses as strings and use them in the booking command.
 
 > nettime -c myconfig.json book pfefferminzia.cosulting 08:00 16:00
 
-You hafe to define task number aliases in the configuration file.
+You have to define task number aliases in the configuration file.
 
 ## API
 [TBD]
