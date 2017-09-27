@@ -39,25 +39,35 @@ class Configuration {
   }
 }
 
-class BookingCommand {
+class Booking {
   public config: Configuration;
   public task: string;
   public date: string;
   public timeStart: string;
   public timeEnd: string;
+}
 
-  public async makeBooking() {
-    if (!this.config.password) {
-      this.config.password = await this.promptForPassword();
+class BookingCommand {
+
+  constructor(private booking: Booking) {
+  }
+
+  public run() {
+    this.makeBooking(this.booking);
+  }
+
+  public async makeBooking(booking: Booking) {
+    if (!booking.config.password) {
+      booking.config.password = await this.promptForPassword();
     }
-    let resolvedTask = this.config.resolveAlias(this.task);
-    if (!!resolvedTask && !!this.date && !!this.timeStart && !!this.timeEnd) {
+    let resolvedTask = booking.config.resolveAlias(booking.task);
+    if (!!resolvedTask && !!booking.date && !!booking.timeStart && !!booking.timeEnd) {
       try {
-        let nettime = new Nettime(this.config.url);
+        let nettime = new Nettime(booking.config.url);
         await nettime.contact();
-        await nettime.login(this.config.user, this.config.password);
+        await nettime.login(booking.config.user, booking.config.password);
         let bookingPage = new ZeitkontierungPage(nettime);
-        await bookingPage.buchen(resolvedTask, this.date, this.timeStart, this.timeEnd);
+        await bookingPage.buchen(resolvedTask, booking.date, booking.timeStart, booking.timeEnd);
         console.log("=================================================================");
         console.log("\x1b[32m%s\x1b[0m", "... OK");
       }
@@ -80,7 +90,6 @@ class BookingCommand {
       });
     });
   }
-
 }
 
 
@@ -101,15 +110,15 @@ program
     cfg.user = program.user || cfg.user;
     cfg.password = program.password || cfg.password;
 
-    let booker = new BookingCommand();
-    booker.config = cfg;
-    booker.task = task;
-    booker.date = date;
-    booker.timeStart = timeStart;
-    booker.timeEnd = timeEnd;
+    let booking = new Booking();
+    booking.config = cfg;
+    booking.task = task;
+    booking.date = date;
+    booking.timeStart = timeStart;
+    booking.timeEnd = timeEnd;
 
-    console.log(booker);
-    booker.makeBooking();
+    console.log(booking);
+    new BookingCommand(booking).run();
   });
 
 program
