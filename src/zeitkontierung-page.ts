@@ -49,11 +49,10 @@ export class ZeitkontierungPage {
 
         let taskNumber = new TaskNumber(target);
 
-        var data = querystring.stringify({
+        var data = {
             "F_Aktual": "Aktualisieren",
-
             "F_PId": taskNumber.getProject(),
-        });
+        };
 
         return new Promise<ZeitkontierungPage>((resolve, reject) => {
             this.nettime.post("/asp/nt_zeitkontierung.asp", data).then((res) => {
@@ -70,7 +69,7 @@ export class ZeitkontierungPage {
 
         let taskNumber = new TaskNumber(target);
 
-        var data = querystring.stringify({
+        var data = {
             "F_Speichern": "Speichern",
 
             "F_PId": taskNumber.getProject(),
@@ -84,7 +83,7 @@ export class ZeitkontierungPage {
             // "F_Pausebuchen": "True",
             // "F_VonPause": "12:00",
             // "F_BisPause": "13:00",
-        });
+        };
 
         return new Promise<string>((resolve, reject) => {
             this.nettime.post("/asp/nt_zeitkontierung.asp", data).then((res) => {

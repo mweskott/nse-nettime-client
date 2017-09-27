@@ -25,12 +25,12 @@ export class Nettime {
     console.log("=================================================================");
     console.log("login");
 
-    var data = querystring.stringify({
-          "F_Login": "Login",
-          "F_MandantenNr": "BFFS",
-          "F_Passwort": password,
-          "F_UNr": user
-        });
+    let  data = {
+      "F_Login": "Login",
+      "F_MandantenNr": "BFFS",
+      "F_Passwort": password,
+      "F_UNr": user
+    };
     return new Promise<Nettime>((resolve, reject) => {
       this.post("/asp/nt_anmeldung.asp?ProgId=0", data).then((res) => {
         fs.writeFile("login.html", res.data, null, () => {
@@ -84,7 +84,7 @@ export class Nettime {
     });
   }
 
-  public post(path: string, data: string): Promise<RequestResult> {
+  public post(path: string, data: any): Promise<RequestResult> {
     return new Promise<RequestResult>((resolve, reject) => {
       let url = new URL(this.url);
       let options: http.RequestOptions = {
@@ -99,7 +99,9 @@ export class Nettime {
       if (this.sessionCookie) {
         options.headers["Cookie"] = this.sessionCookie;
       }
-      options.headers["Content-Length"] = Buffer.byteLength(data);
+      let encodedData = querystring.stringify(data);
+
+      options.headers["Content-Length"] = Buffer.byteLength(encodedData);
 
       let req = https.request(options, (res: http.IncomingMessage) => {
         let rawData = "";
@@ -113,7 +115,7 @@ export class Nettime {
           });
         });
       });
-      req.write(data);
+      req.write(encodedData);
       req.end();
     });
   }
