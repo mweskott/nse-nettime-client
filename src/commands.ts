@@ -64,11 +64,11 @@ export class BookingCommand {
                 await nettime.login(booking.config.user, booking.config.password);
                 let bookingPage = new ZeitkontierungPage(nettime);
                 await bookingPage.buchen(resolvedTask, booking.date, booking.timeStart, booking.timeEnd);
-                console.log("=================================================================");
+                console.log("-----------------------------------------------------------------");
                 console.log("\x1b[32m%s\x1b[0m", "... OK");
             }
             catch (error) {
-                console.log("=================================================================");
+                console.log("-----------------------------------------------------------------");
                 console.log("\x1b[1m\x1b[31m%s\x1b[0m", "... error", error);
             }
             finally {

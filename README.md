@@ -43,5 +43,18 @@ To improve booking performance you can define task number alieses as strings and
 
 You have to define task number aliases in the configuration file.
 
+### Best practice
+
+Place a `nettime.json` with the server url, your user and your favorite aliases in the current directory.
+
+Run the a command with the booking details
+
+> nettime book everyday.task 08:00 16:00
+
+Let the command prompt for your password.
+
+To list the aliases use
+> nettime alias
+
 ## API
 [TBD]
