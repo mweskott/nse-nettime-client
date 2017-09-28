@@ -22,7 +22,7 @@ export class Nettime {
 
   public sessionCookie: string[];
 
-  constructor(public url: string)  {
+  constructor(public url: string) {
   }
 
   public contact(): Promise<OperationResult> {
@@ -43,7 +43,7 @@ export class Nettime {
     console.log("=================================================================");
     console.log("login");
 
-    let  data = {
+    let data = {
       "F_Login": "Login",
       "F_MandantenNr": "BFFS",
       "F_Passwort": password,
@@ -52,11 +52,11 @@ export class Nettime {
     return new Promise<OperationResult>((resolve, reject) => {
       this.post("/asp/nt_anmeldung.asp?ProgId=0", data).then((result) => {
         fs.writeFileSync("login.html", result.data);
-        
-        if (result.data.includes("fehlgeschlagen")) {
-          reject(new OperationResult("login failed"));
-        } else {
+
+        if (result.data.includes("Sie wurden erfolgreich angemeldet.")) {
           resolve(new OperationResult());
+        } else {
+          reject(new OperationResult("login failed"));
         }
       });
     });
