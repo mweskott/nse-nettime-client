@@ -2,96 +2,8 @@
 
 import * as program from "commander";
 import { Nettime, OperationResult } from "./nettime";
+import { BookingCommand, Booking, Configuration, promptForPassword } from "./commands";
 import { ZeitkontierungPage } from "./zeitkontierung-page";
-import fs = require('fs');
-import * as readline from 'readline';
-
-class Alias {
-  [header: string]: string;
-}
-
-class Configuration {
-  public url: string;
-  public user: string;
-  public password: string;
-  public alias: Alias;
-
-  public static createConfigurationFromFile(filename: string) {
-    let cfg = new Configuration();
-    let configurationFile = filename || "nettime.json";
-    if (fs.existsSync(configurationFile)) {
-      try {
-        console.log("reading configuration from file %s", configurationFile);
-        var contents = fs.readFileSync(configurationFile);
-        let fileConfiguration = JSON.parse(contents.toString());
-        Object.assign(cfg, fileConfiguration);
-      }
-      catch (e) {
-        console.log("cannot read configuration file ", filename, e);
-      }
-    }
-    return cfg;
-  }
-
-  public resolveAlias(name: string) {
-    if (!this.alias) return name;
-    return this.alias[name] || name;
-  }
-}
-
-class Booking {
-  public config: Configuration;
-  public task: string;
-  public date: string;
-  public timeStart: string;
-  public timeEnd: string;
-}
-
-class BookingCommand {
-
-  constructor(private booking: Booking) {
-  }
-
-  public run() {
-    this.makeBooking(this.booking);
-  }
-
-  public async makeBooking(booking: Booking) {
-    if (!booking.config.password) {
-      booking.config.password = await this.promptForPassword();
-    }
-    let resolvedTask = booking.config.resolveAlias(booking.task);
-    if (!!resolvedTask && !!booking.date && !!booking.timeStart && !!booking.timeEnd) {
-      try {
-        let nettime = new Nettime(booking.config.url);
-        await nettime.contact();
-        await nettime.login(booking.config.user, booking.config.password);
-        let bookingPage = new ZeitkontierungPage(nettime);
-        await bookingPage.buchen(resolvedTask, booking.date, booking.timeStart, booking.timeEnd);
-        console.log("=================================================================");
-        console.log("\x1b[32m%s\x1b[0m", "... OK");
-      }
-      catch (error) {
-        console.log("=================================================================");
-        console.log("\x1b[1m\x1b[31m%s\x1b[0m", "... error", error);
-      }
-    }
-  }
-
-  private async promptForPassword(): Promise<string> {
-    return new Promise<string>((resolve, reject) => {
-      let rl = readline.createInterface({
-        input: process.stdin,
-        output: process.stdout
-      });
-      rl.question('Enter your nettime password? ', (answer) => {
-        rl.close();
-        resolve(answer);
-      });
-    });
-  }
-}
-
 
 
 program
@@ -101,13 +13,17 @@ program
   .option('-c, --config <configFile>', 'Configuration file');
 
 program
-  .command('book [task] [date] [timeStart] [timeEnd]')
+  .command('book <task> <date> <timeStart> <timeEnd>')
   .description('submit booking')
-  .action((task: string, date: string, timeStart: string, timeEnd: string) => {
+  .action(async (task: string, date: string, timeStart: string, timeEnd: string) => {
     let config = Configuration.createConfigurationFromFile(program.config);
     config.url = program.url || config.url;
     config.user = program.user || config.user;
     config.password = program.password || config.password;
+
+    if (!config.password) {
+      config.password = await promptForPassword();
+    }
 
     let booking = new Booking();
     booking.config = config;
