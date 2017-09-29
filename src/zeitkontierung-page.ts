@@ -3,9 +3,19 @@ import { TaskNumber } from "./task-number";
 const querystring = require('querystring');
 import fs = require('fs');
 
+import * as cheerio from "cheerio";
 
+export class EditableBooking {
+    public id: string;
+    public task: string;
+    public date: string;
+    public timeStart: string;
+    public timeEnd: string;
+}
 
 export class ZeitkontierungPage {
+
+    public editableBookingList: EditableBooking[] = [];
 
     constructor(public nettime: Nettime) {
     }
@@ -35,10 +45,27 @@ export class ZeitkontierungPage {
               
         return new Promise<ZeitkontierungPage>((resolve, reject) => {
             this.nettime.get("/asp/nt_zeitkontierung.asp").then((res) => {
-                fs.writeFile("ansicht.html", res.data, null, () => {
-                    resolve(this);
-                });
+                fs.writeFileSync("ansicht.html", res.data);
+                this.parseEditableBookings(res.data);
+                resolve(this);
             });
+        });
+    }
+
+    private parseEditableBookings(htmlText: string) {
+        let $ = cheerio.load(htmlText);
+        let editable = $("tr[id]");
+
+        this.editableBookingList = [];
+        editable.each((index, element) => {
+            let editable = new EditableBooking();
+            editable.id = element.attribs["id"].substring(7);
+            let columns = $(element).find("td");
+            editable.date = $(columns[2]).text();
+            editable.timeStart = $(columns[3]).text();
+            editable.timeEnd = $(columns[4]).text();
+            editable.task = $(columns[6]).text();
+            this.editableBookingList.push(editable);
         });
     }
 
