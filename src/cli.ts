@@ -41,6 +41,10 @@ program
   .description('list all editable bookings')
   .action(async () => {
     let config = Configuration.createConfigurationFromFile(program.config);
+    config.url = program.url || config.url;
+    config.user = program.user || config.user;
+    config.password = program.password || config.password;
+
     if (!config.password) {
       config.password = await promptForPassword();
     }
