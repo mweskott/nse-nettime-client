@@ -81,6 +81,40 @@ export class BookingCommand {
 }
 
 
+export class ListCommand {
+    
+        constructor(private config: Configuration) {
+        }
+    
+        public run() {
+            this.makeBooking(this.config);
+        }
+    
+        public async makeBooking(config: Configuration) {
+            let nettime = new Nettime(config.url);
+            try {
+                await nettime.contact();
+                await nettime.login(config.user, config.password);
+                let bookingPage = new ZeitkontierungPage(nettime);
+                await bookingPage.ansicht();
+                console.log("-----------------------------------------------------------------");
+                for(let booking of bookingPage.editableBookingList) {
+                    console.log(booking);    
+                }
+            }
+            catch (error) {
+                console.log("-----------------------------------------------------------------");
+                console.log("\x1b[1m\x1b[31m%s\x1b[0m", "... error", error);
+            }
+            finally {
+                if (nettime.sessionCookie) {
+                    await nettime.logout();
+                }
+            }
+        }
+    }
+    
+
 
 export async function promptForPassword(): Promise<string> {
     return new Promise<string>((resolve, reject) => {

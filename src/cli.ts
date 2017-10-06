@@ -2,7 +2,7 @@
 
 import * as program from "commander";
 import { Nettime, OperationResult } from "./nettime";
-import { BookingCommand, Booking, Configuration, promptForPassword } from "./commands";
+import { BookingCommand, Booking, ListCommand, Configuration, promptForPassword } from "./commands";
 import { ZeitkontierungPage } from "./zeitkontierung-page";
 
 
@@ -35,6 +35,18 @@ program
     console.log(booking);
     new BookingCommand(booking).run();
   });
+
+  program
+  .command("list")
+  .description('list all editable bookings')
+  .action(async () => {
+    let config = Configuration.createConfigurationFromFile(program.config);
+    if (!config.password) {
+      config.password = await promptForPassword();
+    }
+    new ListCommand(config).run();
+  });
+
 
 program
   .command("alias")
