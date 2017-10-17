@@ -21,6 +21,7 @@ export class RequestResult {
 export class Nettime {
 
   public sessionCookie: string[];
+  private tracing: boolean = false;
 
   constructor(public url: string) {
   }
@@ -51,7 +52,7 @@ export class Nettime {
     };
     return new Promise<OperationResult>((resolve, reject) => {
       this.post("/asp/nt_anmeldung.asp?ProgId=0", data).then((result) => {
-        fs.writeFileSync("login.html", result.data);
+        this.traceResponse("login.html", result.data);
 
         if (result.data.includes("Sie wurden erfolgreich angemeldet.")) {
           resolve(new OperationResult());
@@ -73,6 +74,10 @@ export class Nettime {
     });
   }
 
+  public traceResponse(name: string, data: any) {
+    if (this.tracing)
+      fs.writeFileSync(name, data);
+  }
 
   public get(path: string): Promise<RequestResult> {
 

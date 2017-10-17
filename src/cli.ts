@@ -33,7 +33,7 @@ program
     booking.timeEnd = timeEnd;
 
     console.log(booking);
-    new BookingCommand(booking).run();
+    await new BookingCommand(booking).run();
   });
 
   program
