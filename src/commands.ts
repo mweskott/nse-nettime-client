@@ -101,6 +101,7 @@ export class ListCommand {
                 for(let booking of bookingPage.editableBookingList) {
                     console.log(booking);    
                 }
+                console.log(bookingPage.getTaskOverview());
             }
             catch (error) {
                 console.log("-----------------------------------------------------------------");

@@ -10,6 +10,17 @@ export class EditableBooking {
     public date: string;
     public timeStart: string;
     public timeEnd: string;
+    public hours: number;
+}
+
+export class TaskOverview {
+    public task: string;
+    public hours: number;
+
+    constructor(task: string) {
+        this.task = task;
+        this.hours = 0.0;
+    }
 }
 
 export class ZeitkontierungPage {
@@ -61,9 +72,22 @@ export class ZeitkontierungPage {
             editable.date = $(columns[2]).text();
             editable.timeStart = $(columns[3]).text();
             editable.timeEnd = $(columns[4]).text();
+            let hoursText = $(columns[5]).text().replace(",", ".");
+            editable.hours = Number.parseFloat(hoursText);
             editable.task = $(columns[6]).text();
             this.editableBookingList.push(editable);
         });
+    }
+
+    public getTaskOverview() : { [key:string]:TaskOverview; } {
+        var overview : { [key:string]:TaskOverview; } = {};
+        this.editableBookingList.forEach(item => {
+            if(!overview[item.task]) {
+                overview[item.task] = new TaskOverview(item.task);
+            }
+            overview[item.task].hours += item.hours;
+        })
+        return overview;
     }
 
     public async aktualisieren(target: string) : Promise<ZeitkontierungPage> {
