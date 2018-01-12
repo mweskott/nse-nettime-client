@@ -43,6 +43,8 @@ export class ZeitkontierungPage {
                 reject({error: "Ungültige Eingabe in Nummernfeld!"});
             if (htmlResponse.includes("sich mit einer bereits erfassten Zeit!"))
                 reject({error: "Die eingegebene Zeit überschneidet sich mit einer bereits erfassten Zeit!"});
+        
+            this.nettime.traceResponseError("buchen-error.html", htmlResponse);
             reject({error: "unknown error"});
         });
     }

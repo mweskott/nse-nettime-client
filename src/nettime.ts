@@ -79,6 +79,10 @@ export class Nettime {
       fs.writeFileSync(name, data);
   }
 
+  public traceResponseError(name: string, data: any) {
+      fs.writeFileSync(name, data);
+  }
+
   public get(path: string): Promise<RequestResult> {
 
     let url = new URL(this.url);
