@@ -7,7 +7,7 @@ Unofficial client for the NSE time recording tool powered by node.js.
 
 ## Command Line
 
-> nettime --url https://nettime.nse.de -u testuser -p mysecret book 123213.23.33.01 08:00 16:00
+> nettime --url https://nettime.nse.de -u testuser -p mysecret book 123213.23.33.01 15.03.2017 08:00 16:00
 
 Use `nettime --help` to list all commands and options.
 
@@ -39,7 +39,7 @@ If no configuration file is given, the command tries to load the file `nettime.j
 Task numbers are sometimes a bit inconvenient.
 To improve booking performance you can define task number alieses as strings and use them in the booking command.
 
-> nettime -c myconfig.json book pfefferminzia.cosulting 08:00 16:00
+> nettime -c myconfig.json book pfefferminzia.cosulting 15.03.2017 08:00 16:00
 
 You have to define task number aliases in the configuration file.
 
@@ -49,7 +49,7 @@ Place a `nettime.json` with the server url, your user and your favorite aliases 
 
 Run the a command with the booking details
 
-> nettime book everyday.task 08:00 16:00
+> nettime book everyday.task 15.03.2017 08:00 16:00
 
 Let the command prompt for your password.
 
