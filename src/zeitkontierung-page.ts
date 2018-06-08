@@ -14,6 +14,8 @@ export class EditableBooking {
 }
 
 export class TaskOverview {
+    public year: string;
+    public month: string;
     public task: string;
     public hours: number;
 
@@ -26,6 +28,7 @@ export class TaskOverview {
 export class ZeitkontierungPage {
 
     public editableBookingList: EditableBooking[] = [];
+    public bookingList: EditableBooking[] = [];
 
     constructor(public nettime: Nettime) {
     }
@@ -57,6 +60,7 @@ export class ZeitkontierungPage {
             this.nettime.get("/asp/nt_zeitkontierung.asp").then((res) => {
                 this.nettime.traceResponse("ansicht.html", res.data);
                 this.parseEditableBookings(res.data);
+                this.parseBookings(res.data);
                 resolve(this);
             });
         });
@@ -81,13 +85,44 @@ export class ZeitkontierungPage {
         });
     }
 
-    public getTaskOverview() : { [key:string]:TaskOverview; } {
-        var overview : { [key:string]:TaskOverview; } = {};
-        this.editableBookingList.forEach(item => {
-            if(!overview[item.task]) {
-                overview[item.task] = new TaskOverview(item.task);
+    private parseBookings(htmlText: string) {
+        let $ = cheerio.load(htmlText);
+        let booking = $("tr[bgcolor]");
+
+        this.bookingList = [];
+        booking.each((index, element) => {
+            let editable = new EditableBooking();
+            let columns = $(element).find("td");
+            editable.date = $(columns[2]).text();
+            editable.timeStart = $(columns[3]).text();
+            editable.timeEnd = $(columns[4]).text();
+            let hoursText = $(columns[5]).text().replace(",", ".");
+            editable.hours = Number.parseFloat(hoursText);
+            editable.task = $(columns[6]).text();
+            this.bookingList.push(editable);
+        });
+    }
+    
+    public getTaskOverview() : { [key:string]: TaskOverview[] } {
+        let overview : { [key:string]: TaskOverview[] } = {};
+        this.bookingList.forEach(bookingItem => {
+            if(!overview[bookingItem.task]) {
+                overview[bookingItem.task] = []; // new TaskOverview(item.task);
             }
-            overview[item.task].hours += item.hours;
+            let taskOverview: TaskOverview = null;
+            let bookingDateParts = bookingItem.date.split(".");
+            overview[bookingItem.task].forEach(overviewItem => {
+                if (bookingDateParts[1] === overviewItem.month && bookingDateParts[2] === overviewItem.year) {
+                    taskOverview = overviewItem;
+                }
+            });
+            if (!taskOverview) {
+                taskOverview = new TaskOverview(bookingItem.task);
+                taskOverview.month = bookingDateParts[1];
+                taskOverview.year = bookingDateParts[2];
+                overview[bookingItem.task].push(taskOverview);
+            }
+            taskOverview.hours += bookingItem.hours;
         })
         return overview;
     }
