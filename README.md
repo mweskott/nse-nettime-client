@@ -28,7 +28,7 @@ If no configuration file is given, the command tries to load the file `nettime.j
   "user": "mynettimeuser",
   "url": "https://nettime.example.org",
   "alias": {
-    "pfefferminzia.cosulting": "225487.01.15.02",
+    "pfefferminzia.consulting": "225487.01.15.02",
     "pfefferminzia.aiting": "345487.01.15.17"
   }
 }
@@ -39,7 +39,7 @@ If no configuration file is given, the command tries to load the file `nettime.j
 Task numbers are sometimes a bit inconvenient.
 To improve booking performance you can define task number alieses as strings and use them in the booking command.
 
-> nettime -c myconfig.json book pfefferminzia.cosulting 15.03.2017 08:00 16:00
+> nettime -c myconfig.json book pfefferminzia.consulting 15.03.2017 08:00 16:00
 
 You have to define task number aliases in the configuration file.
 

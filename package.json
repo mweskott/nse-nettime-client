@@ -1,6 +1,6 @@
 {
-  "name": "nettime",
-  "version": "0.0.1",
+  "name": "nse-nettime-client",
+  "version": "0.0.2",
   "description": "nettime remote control",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -15,7 +15,7 @@
     "test": "npm run compile && mocha dist",
     "compile": "tsc"
   },
-  "author": "",
+  "author": "Markus Weskott",
   "license": "ISC",
   "devDependencies": {
     "@types/cheerio": "^0.22.2",
