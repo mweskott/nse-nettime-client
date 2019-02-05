@@ -46,7 +46,7 @@ export class Nettime {
 
     let data = {
       "F_Login": "Login",
-      "F_MandantenNr": "BFFS",
+      "F_MandantenNr": "CEGEKA",
       "F_Passwort": password,
       "F_UNr": user
     };
