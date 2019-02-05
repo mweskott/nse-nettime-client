@@ -1,6 +1,6 @@
 {
   "name": "nse-nettime-client",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "nettime remote control",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -20,9 +20,9 @@
   "devDependencies": {
     "@types/cheerio": "^0.22.2",
     "@types/commander": "^2.9.2",
-    "@types/mocha": "^2.2.43",
+    "@types/mocha": "^5.2.5",
     "@types/node": "^8.0.28",
-    "mocha": "^3.5.3",
+    "mocha": "^5.2.0",
     "typescript": "^2.5.2"
   },
   "dependencies": {
