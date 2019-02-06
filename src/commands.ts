@@ -1,6 +1,8 @@
 import { Nettime, OperationResult } from "./nettime";
 import { ZeitkontierungPage } from "./zeitkontierung-page";
 import fs = require('fs');
+import path = require('path');
+import os = require('os');
 import * as readline from 'readline';
 
 
@@ -16,17 +18,19 @@ export class Configuration {
 
     public static createConfigurationFromFile(filename: string) {
         let cfg = new Configuration();
-        let configurationFile = filename || "nettime.json";
-        if (fs.existsSync(configurationFile)) {
-            try {
-                console.log("reading configuration from file %s", configurationFile);
-                var contents = fs.readFileSync(configurationFile);
-                let fileConfiguration = JSON.parse(contents.toString());
-                Object.assign(cfg, fileConfiguration);
-            }
-            catch (e) {
-                console.log("cannot read configuration file ", filename, e);
-            }
+        const configurationFile = filename || path.join(os.homedir(), '.nettime.json');
+        if (!fs.existsSync(configurationFile)) {
+            console.log("no configuration file found at %s", configurationFile);
+            return cfg;
+        }
+        try {
+            console.log("reading configuration from file %s", configurationFile);
+            var contents = fs.readFileSync(configurationFile);
+            let fileConfiguration = JSON.parse(contents.toString());
+            Object.assign(cfg, fileConfiguration);
+        }
+        catch (e) {
+            console.log("cannot read configuration file ", filename, e);
         }
         return cfg;
     }

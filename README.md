@@ -21,7 +21,7 @@ Use `nettime --help` to list all commands and options.
 ### Configuration files
 
 To define static options, you can provide a configuration file in json format.
-If no configuration file is given, the command tries to load the file `nettime.json`.
+If no configuration file is given, the command tries to load the file `.nettime.json` from the home directory of the user.
 
 ```javascript
 {
