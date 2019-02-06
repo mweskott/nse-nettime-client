@@ -118,18 +118,3 @@ export class ListCommand {
             }
         }
     }
-    
-
-
-export async function promptForPassword(): Promise<string> {
-    return new Promise<string>((resolve, reject) => {
-        let rl = readline.createInterface({
-            input: process.stdin,
-            output: process.stdout
-        });
-        rl.question('Enter your nettime password! ', (answer) => {
-            rl.close();
-            resolve(answer);
-        });
-    });
-}

@@ -1,7 +1,13 @@
 #!/usr/bin/env node
 
 import * as program from 'commander';
-import { Booking, BookingCommand, Configuration, ListCommand, promptForPassword } from './commands';
+import os = require('os');
+import * as prompt from 'prompt-sync';
+import { Booking, BookingCommand, Configuration, ListCommand } from './commands';
+
+function inputPassword(username: string) {
+  return prompt()(`enter password for user ${username}: `, {echo: '.'});
+}
 
 program
   .option('--url <url>', 'Nettime server URL')
@@ -15,11 +21,11 @@ program
   .action(async (task: string, date: string, timeStart: string, timeEnd: string) => {
     const config = Configuration.createConfigurationFromFile(program.config);
     config.url = program.url || config.url;
-    config.user = program.user || config.user;
+    config.user = program.user || config.user || os.userInfo().username;
     config.password = program.password || config.password;
 
     if (!config.password) {
-      config.password = await promptForPassword();
+      config.password = inputPassword(config.user);
     }
 
     const booking = new Booking();
@@ -43,7 +49,7 @@ program
     config.password = program.password || config.password;
 
     if (!config.password) {
-      config.password = await promptForPassword();
+      config.password = inputPassword(config.user);
     }
     new ListCommand(config).run();
   });
@@ -60,4 +66,7 @@ program
     }
   });
 
-program.parse(process.argv);
+// async main
+(async () => {
+  program.parse(process.argv);
+})();

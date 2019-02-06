@@ -23,13 +23,15 @@
     "@types/commander": "^2.9.2",
     "@types/mocha": "^5.2.5",
     "@types/node": "^8.0.28",
+    "@types/prompt-sync": "^4.1.0",
     "mocha": "^5.2.0",
     "tslint": "^5.12.1",
     "typescript": "^2.5.2"
   },
   "dependencies": {
     "cheerio": "^1.0.0-rc.2",
-    "commander": "^2.11.0"
+    "commander": "^2.11.0",
+    "prompt-sync": "^4.1.6"
   },
   "engines": {
     "node": ">=7.9.0",
