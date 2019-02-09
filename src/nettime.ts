@@ -1,8 +1,9 @@
-import * as http from "http";
-import * as https from "https";
-import { URL } from "url";
-import querystring = require('querystring');
 import fs = require('fs');
+import * as cheerio from 'cheerio';
+import * as http from 'http';
+import * as https from 'https';
+import querystring = require('querystring');
+import { URL } from "url";
 
 
 export class OperationResult {
@@ -18,10 +19,11 @@ export class RequestResult {
   public data: string;
 }
 
+// tslint:disable-next-line:max-classes-per-file
 export class Nettime {
 
   public sessionCookie: string[];
-  private tracing: boolean = false;
+  private tracing: boolean = true;
 
   constructor(public url: string) {
   }
@@ -64,19 +66,28 @@ export class Nettime {
   }
 
   public logout(): Promise<OperationResult> {
-    console.log("=================================================================");
-    console.log("logout");
+    console.log('=================================================================');
+    console.log('logout');
 
     return new Promise<OperationResult>((resolve, reject) => {
-      this.get("/asp/nt_abmelden.asp").then((res) => {
+      this.get('/asp/nt_abmelden.asp').then((res) => {
         resolve(new OperationResult());
       });
     });
   }
 
+  public async getUserId(userName: string): Promise<string> {
+    const res = await this.get(`/asp/nt_users_l.asp?SearchStr=${userName}&RetFields=F_UId=UNr`);
+    this.traceResponse('findUser.html', res.data);
+    const $ = cheerio.load(res.data);
+    const userElements = $('tr[id]');
+    return  userElements[0].attribs.id.substring(7);
+  }
+
   public traceResponse(name: string, data: any) {
-    if (this.tracing)
+    if (this.tracing) {
       fs.writeFileSync(name, data);
+    }
   }
 
   public traceResponseError(name: string, data: any) {

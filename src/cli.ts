@@ -4,6 +4,7 @@ import * as program from 'commander';
 import os = require('os');
 import * as prompt from 'prompt-sync';
 import { Booking, BookingCommand, Configuration, ListCommand } from './commands';
+import { ProjekteCommand } from './commands/projects-command';
 
 function inputPassword(username: string) {
   return prompt()(`enter password for user ${username}: `, {echo: '.'});
@@ -52,6 +53,21 @@ program
       config.password = inputPassword(config.user);
     }
     new ListCommand(config).run();
+  });
+
+program
+  .command('projects')
+  .description('list all projects with booking rights')
+  .action(async () => {
+    const config = Configuration.createConfigurationFromFile(program.config);
+    config.url = program.url || config.url;
+    config.user = program.user || config.user;
+    config.password = program.password || config.password;
+
+    if (!config.password) {
+      config.password = inputPassword(config.user);
+    }
+    new ProjekteCommand(config).run();
   });
 
 program
