@@ -4,7 +4,7 @@ import * as program from 'commander';
 import os = require('os');
 import * as prompt from 'prompt-sync';
 import { Booking, BookingCommand, Configuration, ListCommand } from './commands';
-import { ProjekteCommand } from './commands/projects-command';
+import { ProjectsCommand } from './commands/projects-command';
 
 function inputPassword(username: string) {
   return prompt()(`enter password for user ${username}: `, {echo: '.'});
@@ -67,7 +67,7 @@ program
     if (!config.password) {
       config.password = inputPassword(config.user);
     }
-    new ProjekteCommand(config).run();
+    new ProjectsCommand(config).run();
   });
 
 program

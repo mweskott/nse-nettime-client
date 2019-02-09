@@ -76,14 +76,6 @@ export class Nettime {
     });
   }
 
-  public async getUserId(userName: string): Promise<string> {
-    const res = await this.get(`/asp/nt_users_l.asp?SearchStr=${userName}&RetFields=F_UId=UNr`);
-    this.traceResponse('findUser.html', res.data);
-    const $ = cheerio.load(res.data);
-    const userElements = $('tr[id]');
-    return  userElements[0].attribs.id.substring(7);
-  }
-
   public traceResponse(name: string, data: any) {
     if (this.tracing) {
       fs.writeFileSync(name, data);

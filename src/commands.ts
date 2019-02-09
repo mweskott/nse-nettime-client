@@ -1,5 +1,5 @@
 import { Nettime, OperationResult } from "./nettime";
-import { ZeitkontierungPage } from "./zeitkontierung-page";
+import { ZeitkontierungPage } from "./pages/zeitkontierung-page";
 import fs = require('fs');
 import path = require('path');
 import os = require('os');
