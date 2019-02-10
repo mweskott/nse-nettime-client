@@ -4,7 +4,7 @@ import * as program from 'commander';
 import os = require('os');
 import * as prompt from 'prompt-sync';
 import { Booking, BookingCommand, Configuration, ListCommand } from './commands';
-import { ProjectsCommand } from './commands/projects-command';
+import { JobsCommand } from './commands/jobs-command';
 
 function inputPassword(username: string) {
   return prompt()(`enter password for user ${username}: `, {echo: '.'});
@@ -56,8 +56,8 @@ program
   });
 
 program
-  .command('projects')
-  .description('list all projects with booking rights')
+  .command('jobs')
+  .description('list all jobs with booking rights of the user')
   .action(async () => {
     const config = Configuration.createConfigurationFromFile(program.config);
     config.url = program.url || config.url;
@@ -67,7 +67,7 @@ program
     if (!config.password) {
       config.password = inputPassword(config.user);
     }
-    new ProjectsCommand(config).run();
+    new JobsCommand(config).run();
   });
 
 program
