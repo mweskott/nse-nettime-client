@@ -41,44 +41,49 @@ export class Configuration {
     }
 }
 
-export class Booking {
+export class BookingCommandData {
     public config: Configuration;
-    public task: string;
+    public bookings: BookingData[];
+}
+
+export class BookingData {
+    public config: Configuration;
+    public task: string;    
     public date: string;
     public timeStart: string;
     public timeEnd: string;
 }
 
-
+// tslint:disable-next-line:max-classes-per-file
 export class BookingCommand {
 
-    constructor(private booking: Booking) {
+    constructor(private bookingCommandData: BookingCommandData) {
     }
 
     public run() {
-        this.makeBooking(this.booking);
+        this.makeBooking(this.bookingCommandData);
     }
 
-    public async makeBooking(booking: Booking) {
-        let resolvedTask = booking.config.resolveAlias(booking.task);
-        if (!!resolvedTask && !!booking.date && !!booking.timeStart && !!booking.timeEnd) {
-            let nettime = new Nettime(booking.config.url);
-            try {
-                await nettime.contact();
-                await nettime.login(booking.config.user, booking.config.password);
-                let bookingPage = new ZeitkontierungPage(nettime);
-                let bookingResult = await bookingPage.buchen(resolvedTask, booking.date, booking.timeStart, booking.timeEnd);
-                console.log("-----------------------------------------------------------------");
-                console.log("\x1b[32m%s\x1b[0m", "... OK");
-            }
-            catch (error) {
-                console.log("-----------------------------------------------------------------");
-                console.log("\x1b[1m\x1b[31m%s\x1b[0m", "... error", error);
-            }
-            finally {
-                if (nettime.sessionCookie) {
-                    await nettime.logout();
+    public async makeBooking(bookingCommands: BookingCommandData) {
+        const nettime = new Nettime(bookingCommands.config.url);
+        try {
+            await nettime.contact();
+            await nettime.login(bookingCommands.config.user, bookingCommands.config.password);
+            for (const booking of bookingCommands.bookings) {
+                const resolvedTask = bookingCommands.config.resolveAlias(booking.task);
+                if (!!resolvedTask && !!booking.date && !!booking.timeStart && !!booking.timeEnd) {
+                    const bookingPage = new ZeitkontierungPage(nettime);
+                    const bookingResult = await bookingPage.buchen(resolvedTask, booking.date, booking.timeStart, booking.timeEnd);
+                    console.log('-----------------------------------------------------------------');
+                    console.log('\x1b[32m%s\x1b[0m', '... OK');
                 }
+            }
+        } catch (error) {
+            console.log('-----------------------------------------------------------------');
+            console.log('\x1b[1m\x1b[31m%s\x1b[0m', '... error', error);
+        } finally {
+            if (nettime.sessionCookie) {
+                await nettime.logout();
             }
         }
     }

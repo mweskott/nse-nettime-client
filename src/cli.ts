@@ -3,11 +3,19 @@
 import * as program from 'commander';
 import os = require('os');
 import * as prompt from 'prompt-sync';
-import { Booking, BookingCommand, Configuration, ListCommand } from './commands';
+import { BookingData, BookingCommandData, BookingCommand, Configuration, ListCommand } from './commands';
 import { JobsCommand } from './commands/jobs-command';
 
 function inputPassword(username: string) {
   return prompt()(`enter password for user ${username}: `, {echo: '.'});
+}
+
+function getStartTime(interval: string): string {
+  return interval.split('-')[0];
+}
+
+function getEndTime(interval: string): string {
+  return interval.split('-')[1];
 }
 
 program
@@ -17,9 +25,9 @@ program
   .option('-c, --config <configFile>', 'Configuration file');
 
 program
-  .command('book <task> <date> <timeStart> <timeEnd>')
+  .command('book <task> <date> <intervals...>')
   .description('submit booking')
-  .action(async (task: string, date: string, timeStart: string, timeEnd: string) => {
+  .action(async (task: string, date: string, intervals: string[]) => {
     const config = Configuration.createConfigurationFromFile(program.config);
     config.url = program.url || config.url;
     config.user = program.user || config.user || os.userInfo().username;
@@ -29,15 +37,20 @@ program
       config.password = inputPassword(config.user);
     }
 
-    const booking = new Booking();
-    booking.config = config;
-    booking.task = task;
-    booking.date = date;
-    booking.timeStart = timeStart;
-    booking.timeEnd = timeEnd;
+    const commandData = new BookingCommandData();
+    commandData.config = config;
+    commandData.bookings = intervals.map((interval) => {
+      const booking = new BookingData();
+      booking.config = config;
+      booking.task = task;
+      booking.date = date;
+      booking.timeStart = getStartTime(interval);
+      booking.timeEnd = getEndTime(interval);
+      console.log(booking);
+      return booking;
+    });
 
-    console.log(booking);
-    await new BookingCommand(booking).run();
+    await new BookingCommand(commandData).run();
   });
 
 program

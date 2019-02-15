@@ -1,13 +1,14 @@
 # nse-nettime-client
+
 Unofficial client for the NSE time recording tool powered by node.js.
 
-
 ## Installing
+
 > npm install -g nse-nettime-client
 
 ## Command Line
 
-> nettime --url https://nettime.nse.de -u testuser -p mysecret book 123213.23.33.01 15.03.2017 08:00 16:00
+> `nettime --url https://nettime.nse.de -u testuser -p mysecret book 123213.23.33.01 15.03.2017 08:00-16:00`
 
 Use `nettime --help` to list all commands and options.
 
@@ -39,22 +40,25 @@ If no configuration file is given, the command tries to load the file `.nettime.
 Task numbers are sometimes a bit inconvenient.
 To improve booking performance you can define task number alieses as strings and use them in the booking command.
 
-> nettime -c myconfig.json book pfefferminzia.consulting 15.03.2017 08:00 16:00
+> `nettime -c myconfig.json book pfefferminzia.consulting 15.03.2017 08:00 16:00`
 
 You have to define task number aliases in the configuration file.
 
 ### Best practice
 
-Place a `nettime.json` with the server url, your user and your favorite aliases in the current directory.
-
 Run the a command with the booking details
 
-> nettime book everyday.task 15.03.2017 08:00 16:00
+> `nettime book everyday.task 15.03.2017 08:00-16:00`
 
 Let the command prompt for your password.
+
+If you want to publish more than on time period per booking, simply type
+
+> `nettime book everyday.task 22.02.2019 7-9 11-13:30 14-17`
 
 To list the aliases use
 > nettime alias
 
 ## API
+
 [TBD]
