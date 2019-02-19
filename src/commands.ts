@@ -5,38 +5,45 @@ import path = require('path');
 import os = require('os');
 import * as readline from 'readline';
 
-
 export class Alias {
     [header: string]: string;
 }
 
+// tslint:disable-next-line:max-classes-per-file
 export class Configuration {
-    public url: string;
-    public user: string;
-    public password: string;
-    public alias: Alias;
-
-    public static createConfigurationFromFile(filename: string) {
+    public static createConfigurationFromFile(filename: string): Configuration {
         let cfg = new Configuration();
         const configurationFile = filename || path.join(os.homedir(), '.nettime.json');
         if (!fs.existsSync(configurationFile)) {
-            console.log("no configuration file found at %s", configurationFile);
+            console.log('no configuration file found at %s', configurationFile);
             return cfg;
         }
         try {
-            console.log("reading configuration from file %s", configurationFile);
-            var contents = fs.readFileSync(configurationFile);
-            let fileConfiguration = JSON.parse(contents.toString());
+            console.log('reading configuration from file %s', configurationFile);
+            const contents = fs.readFileSync(configurationFile);
+            const fileConfiguration = JSON.parse(contents.toString());
             Object.assign(cfg, fileConfiguration);
-        }
-        catch (e) {
-            console.log("cannot read configuration file ", filename, e);
+        } catch (e) {
+            console.log('cannot read configuration file ', filename, e);
         }
         return cfg;
     }
 
+    public static writeConfigurationToFile(cfg: Configuration, filename: string) {
+        const configurationFile = filename || path.join(os.homedir(), '.nettime.json');
+        console.log('writing configuration to file %s', configurationFile);
+        fs.writeFileSync(configurationFile, JSON.stringify(cfg));
+    }
+
+    public url: string;
+    public user: string;
+    public password: string;
+    public alias: Alias = new Alias();
+
     public resolveAlias(name: string) {
-        if (!this.alias) return name;
+        if (!this.alias) {
+            return name;
+        }
         return this.alias[name] || name;
     }
 }
