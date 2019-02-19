@@ -1,7 +1,8 @@
 import * as cheerio from 'cheerio';
+import { Job } from '../model/job';
+import { TaskInfo } from '../model/task-info';
 import { Nettime } from '../nettime';
 import { TaskNumber } from '../task-number';
-import { Job } from '../model/job';
 
 export class ProjectSearchPage {
 
@@ -26,6 +27,27 @@ export class ProjectSearchPage {
             // console.log(`${id} ${projekt} ${bezeichnung} ${kunde}`);
         });
         return ids;
+    }
+
+    public async getProjectsForUser(userId: string): Promise<TaskInfo[]> {
+        const res = await this.nettime.get(`/asp/nt_projekt_l.asp?RetFields==&QMode=1&QModeKey=${userId}`);
+
+        const $ = cheerio.load(res.data);
+        const projektElemente = $('tr[id]');
+
+        const projects: TaskInfo[] = [];
+        projektElemente.each((index, element) => {
+            const id = element.attribs.id.substring(7);
+            const columns = $(element).find('td');
+            const projekt = $(columns[1]).text();
+            const projectNumber = new TaskNumber(projekt);
+            const bezeichnung = $(columns[2]).text();
+            const kunde = $(columns[3]).text();
+            const taskInfo = new TaskInfo(projectNumber, bezeichnung, id);
+            projects.push(taskInfo);
+            // console.log(`${id} ${projekt} ${bezeichnung} ${kunde}`);
+        });
+        return projects;
     }
 
     public async getSubjectsIds(projectId: string): Promise<string[]> {

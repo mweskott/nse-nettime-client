@@ -10,10 +10,10 @@ export class JobsCommand {
     }
 
     public run() {
-        this.makeBooking(this.config);
+        this.collectJobsforUser(this.config);
     }
 
-    public async makeBooking(config: Configuration) {
+    public async collectJobsforUser(config: Configuration) {
         const nettime = new Nettime(config.url);
         try {
             await nettime.contact();
@@ -39,6 +39,10 @@ export class JobsCommand {
 
     private async collectJobsAsync(nettime: Nettime, userId: string): Promise<Job[]> {
         const projectSearchPage = new ProjectSearchPage(nettime);
+
+        const info = await projectSearchPage.getProjectsForUser(userId);
+        console.log(info);
+
         const projects = await projectSearchPage.getProjectIdsForUser(userId);
         const jobMap = await this.collectJobsForProjectList(projectSearchPage, projects);
         return jobMap;
