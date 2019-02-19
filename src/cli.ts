@@ -84,14 +84,23 @@ program
   });
 
 program
-  .command('alias')
+  .command('alias [aliasname] [tasknumber]')
   .description('list task number aliases')
-  .action(() => {
+  .action((aliasname, tasknumber) => {
     const cfg = Configuration.createConfigurationFromFile(program.config);
-    if (cfg.alias) {
-      Object.keys(cfg.alias).forEach((name) => {
-        console.log(name, cfg.alias[name]);
-      });
+
+    if (tasknumber) {
+      cfg.alias[aliasname] = tasknumber;
+      console.log('setting alias entry', aliasname, cfg.alias[aliasname]);
+      Configuration.writeConfigurationToFile(cfg, program.config);
+    } else if (aliasname) {
+      console.log(aliasname, cfg.alias[aliasname]);
+    } else {
+      if (cfg.alias) {
+        Object.keys(cfg.alias).forEach((name) => {
+          console.log(name, cfg.alias[name]);
+        });
+      }
     }
   });
 
