@@ -94,7 +94,9 @@ program
       console.log('setting alias entry', aliasname, cfg.alias[aliasname]);
       Configuration.writeConfigurationToFile(cfg, program.config);
     } else if (aliasname) {
-      console.log(aliasname, cfg.alias[aliasname]);
+      console.log(`remove alias entry ${aliasname} ${cfg.alias[aliasname]}`);
+      cfg.alias[aliasname] = undefined;
+      Configuration.writeConfigurationToFile(cfg, program.config);
     } else {
       if (cfg.alias) {
         Object.keys(cfg.alias).forEach((name) => {
