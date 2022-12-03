@@ -24,7 +24,7 @@
     "@types/mocha": "^5.2.5",
     "@types/node": "^8.0.28",
     "@types/prompt-sync": "^4.1.0",
-    "mocha": "^5.2.0",
+    "mocha": "^10.1.0",
     "semantic-release": "^15.13.3",
     "tslint": "^5.12.1",
     "typescript": "^2.5.2"
