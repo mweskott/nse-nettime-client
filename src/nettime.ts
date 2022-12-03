@@ -5,9 +5,8 @@ import * as https from 'https';
 import querystring = require('querystring');
 import { URL } from "url";
 
-
 export class OperationResult {
-  error: string;
+  public error: string;
 
   constructor(error?: string) {
     this.error = error;
@@ -34,11 +33,11 @@ export class Nettime {
 
     return new Promise<OperationResult>((resolve, reject) => {
       this.get("/").then((res) => {
-        this.sessionCookie = <string[]>res.message.headers["set-cookie"];
+        this.sessionCookie = <string[]> res.message.headers["set-cookie"];
         resolve(new OperationResult());
       }).catch((result) => {
         reject(new OperationResult("contact failed"));
-      })
+      });
     });
   }
 
