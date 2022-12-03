@@ -22,9 +22,8 @@ export class RequestResult {
 export class Nettime {
 
   public sessionCookie: string[];
-  private tracing: boolean = true;
 
-  constructor(public url: string) {
+  constructor(public url: string, private tracing?: boolean | false) {
   }
 
   public contact(): Promise<OperationResult> {

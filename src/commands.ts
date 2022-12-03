@@ -1,9 +1,9 @@
 import { Nettime, OperationResult } from "./nettime";
 import { ZeitkontierungPage } from "./pages/zeitkontierung-page";
-import fs = require('fs');
-import path = require('path');
-import os = require('os');
-import * as readline from 'readline';
+import fs = require("fs");
+import path = require("path");
+import os = require("os");
+import * as readline from "readline";
 
 export class Alias {
     [header: string]: string;
@@ -13,31 +13,32 @@ export class Alias {
 export class Configuration {
     public static createConfigurationFromFile(filename: string): Configuration {
         let cfg = new Configuration();
-        const configurationFile = filename || path.join(os.homedir(), '.nettime.json');
+        const configurationFile = filename || path.join(os.homedir(), ".nettime.json");
         if (!fs.existsSync(configurationFile)) {
-            console.log('no configuration file found at %s', configurationFile);
+            console.log("no configuration file found at %s", configurationFile);
             return cfg;
         }
         try {
-            console.log('reading configuration from file %s', configurationFile);
+            console.log("reading configuration from file %s", configurationFile);
             const contents = fs.readFileSync(configurationFile);
             const fileConfiguration = JSON.parse(contents.toString());
             Object.assign(cfg, fileConfiguration);
         } catch (e) {
-            console.log('cannot read configuration file ', filename, e);
+            console.log("cannot read configuration file ", filename, e);
         }
         return cfg;
     }
 
     public static writeConfigurationToFile(cfg: Configuration, filename: string) {
-        const configurationFile = filename || path.join(os.homedir(), '.nettime.json');
-        console.log('writing configuration to file %s', configurationFile);
+        const configurationFile = filename || path.join(os.homedir(), ".nettime.json");
+        console.log("writing configuration to file %s", configurationFile);
         fs.writeFileSync(configurationFile, JSON.stringify(cfg));
     }
 
     public url: string;
     public user: string;
     public password: string;
+    public tracing: boolean = false;
     public alias: Alias = new Alias();
 
     public resolveAlias(name: string) {
@@ -55,7 +56,7 @@ export class BookingCommandData {
 
 export class BookingData {
     public config: Configuration;
-    public task: string;    
+    public task: string;
     public date: string;
     public timeStart: string;
     public timeEnd: string;
@@ -72,7 +73,7 @@ export class BookingCommand {
     }
 
     public async makeBooking(bookingCommands: BookingCommandData) {
-        const nettime = new Nettime(bookingCommands.config.url);
+        const nettime = new Nettime(bookingCommands.config.url, bookingCommands.config.tracing);
         try {
             await nettime.contact();
             await nettime.login(bookingCommands.config.user, bookingCommands.config.password);
@@ -81,13 +82,13 @@ export class BookingCommand {
                 if (!!resolvedTask && !!booking.date && !!booking.timeStart && !!booking.timeEnd) {
                     const bookingPage = new ZeitkontierungPage(nettime);
                     const bookingResult = await bookingPage.buchen(resolvedTask, booking.date, booking.timeStart, booking.timeEnd);
-                    console.log('-----------------------------------------------------------------');
-                    console.log('\x1b[32m%s\x1b[0m', '... OK');
+                    console.log("-----------------------------------------------------------------");
+                    console.log("\x1b[32m%s\x1b[0m", "... OK");
                 }
             }
         } catch (error) {
-            console.log('-----------------------------------------------------------------');
-            console.log('\x1b[1m\x1b[31m%s\x1b[0m', '... error', error);
+            console.log("-----------------------------------------------------------------");
+            console.log("\x1b[1m\x1b[31m%s\x1b[0m", "... error", error);
         } finally {
             if (nettime.sessionCookie) {
                 await nettime.logout();
@@ -96,37 +97,35 @@ export class BookingCommand {
     }
 }
 
-
 export class ListCommand {
-    
-        constructor(private config: Configuration) {
-        }
-    
-        public run() {
-            this.makeBooking(this.config);
-        }
-    
-        public async makeBooking(config: Configuration) {
-            let nettime = new Nettime(config.url);
-            try {
-                await nettime.contact();
-                await nettime.login(config.user, config.password);
-                let bookingPage = new ZeitkontierungPage(nettime);
-                await bookingPage.ansicht();
-                console.log("-----------------------------------------------------------------");
-                for(let booking of bookingPage.editableBookingList) {
-                    console.log(booking);    
-                }
-                console.log(bookingPage.getTaskOverview());
+    constructor(private config: Configuration) {
+    }
+
+    public run() {
+        this.makeBooking(this.config);
+    }
+
+    public async makeBooking(config: Configuration) {
+        const nettime = new Nettime(config.url, config.tracing);
+        try {
+            await nettime.contact();
+            await nettime.login(config.user, config.password);
+            let bookingPage = new ZeitkontierungPage(nettime);
+            await bookingPage.ansicht();
+            console.log("-----------------------------------------------------------------");
+            for(let booking of bookingPage.editableBookingList) {
+                console.log(booking);
             }
-            catch (error) {
-                console.log("-----------------------------------------------------------------");
-                console.log("\x1b[1m\x1b[31m%s\x1b[0m", "... error", error);
-            }
-            finally {
-                if (nettime.sessionCookie) {
-                    await nettime.logout();
-                }
+            console.log(bookingPage.getTaskOverview());
+        }
+        catch (error) {
+            console.log("-----------------------------------------------------------------");
+            console.log("\x1b[1m\x1b[31m%s\x1b[0m", "... error", error);
+        }
+        finally {
+            if (nettime.sessionCookie) {
+                await nettime.logout();
             }
         }
     }
+}

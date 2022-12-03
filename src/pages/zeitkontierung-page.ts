@@ -1,6 +1,6 @@
-import * as cheerio from 'cheerio';
-import { Nettime, OperationResult } from '../nettime';
-import { TaskNumber } from '../task-number';
+import * as cheerio from "cheerio";
+import { Nettime, OperationResult } from "../nettime";
+import { TaskNumber } from "../task-number";
 
 export class EditableBooking {
     public id: string;
@@ -38,18 +38,18 @@ export class ZeitkontierungPage {
             await bookingPage.aktualisieren(target);
             const htmlResponse = await bookingPage.speichern(target, date, timeStart, timeEnd);
 
-            if (htmlResponse.includes('Ihre Eingaben wurden erfolgreich gespeichert.')) {
-                resolve({} as OperationResult);
+            if (htmlResponse.includes("Ihre Eingaben wurden erfolgreich gespeichert.")) {
+                return resolve({} as OperationResult);
             }
-            if (htmlResponse.includes(' Eingabe in Nummernfeld!')) {
-                reject({error: 'Ungültige Eingabe in Nummernfeld!'});
+            if (htmlResponse.includes(" Eingabe in Nummernfeld!")) {
+                return reject({error: "Ungültige Eingabe in Nummernfeld!"});
             }
-            if (htmlResponse.includes('sich mit einer bereits erfassten Zeit!')) {
-                reject({error: 'Die eingegebene Zeit überschneidet sich mit einer bereits erfassten Zeit!'});
+            if (htmlResponse.includes("sich mit einer bereits erfassten Zeit!")) {
+                return reject({error: "Die eingegebene Zeit überschneidet sich mit einer bereits erfassten Zeit!"});
             }
 
-            this.nettime.traceResponseError('buchen-error.html', htmlResponse);
-            reject({error: 'unknown error'});
+            this.nettime.traceResponseError("buchen-error.html", htmlResponse);
+            return reject({error: "unknown error"});
         });
     }
 
@@ -103,9 +103,9 @@ export class ZeitkontierungPage {
             this.bookingList.push(editable);
         });
     }
-    
-    public getTaskOverview() : { [key:string]: TaskOverview[] } {
-        let overview : { [key:string]: TaskOverview[] } = {};
+
+    public getTaskOverview(): { [key:string]: TaskOverview[] } {
+        let overview: { [key: string]: TaskOverview[] } = {};
         this.bookingList.forEach(bookingItem => {
             if(!overview[bookingItem.task]) {
                 overview[bookingItem.task] = []; // new TaskOverview(item.task);

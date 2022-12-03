@@ -23,7 +23,8 @@ program
   .option("--url <url>", "Nettime server URL")
   .option("-u, --user <login>", "User login")
   .option("-p, --password <password>", "Password")
-  .option("-c, --config <configFile>", "Configuration file");
+  .option("-c, --config <configFile>", "Configuration file")
+    .option("--trace", "write server responses to files in current directory");
 
 program
   .command("book <task> <date> <intervals...>")
