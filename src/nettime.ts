@@ -1,8 +1,8 @@
-import fs = require('fs');
-import * as cheerio from 'cheerio';
-import * as http from 'http';
-import * as https from 'https';
-import querystring = require('querystring');
+import fs = require("fs");
+import * as cheerio from "cheerio";
+import * as http from "http";
+import * as https from "https";
+import querystring = require("querystring");
 import { URL } from "url";
 
 export class OperationResult {
@@ -64,11 +64,11 @@ export class Nettime {
   }
 
   public logout(): Promise<OperationResult> {
-    console.log('=================================================================');
-    console.log('logout');
+    console.log("=================================================================");
+    console.log("logout");
 
     return new Promise<OperationResult>((resolve, reject) => {
-      this.get('/asp/nt_abmelden.asp').then((res) => {
+      this.get("/asp/nt_abmelden.asp").then((res) => {
         resolve(new OperationResult());
       });
     });
@@ -86,13 +86,13 @@ export class Nettime {
 
   public get(path: string): Promise<RequestResult> {
 
-    let url = new URL(this.url);
+    const url = new URL(this.url);
     return new Promise<RequestResult>((resolve, reject) => {
-      let options: http.RequestOptions = {
+      const options: http.RequestOptions = {
         hostname: url.hostname,
         port: url.port,
         path: path,
-        method: 'GET',
+        method: "GET",
         headers: {}
       };
       if (this.sessionCookie) {
@@ -101,10 +101,10 @@ export class Nettime {
 
       let req = https.request(options, (res: http.IncomingMessage) => {
         let rawData = "";
-        res.on('data', (d) => {
+        res.on("data", (d) => {
           rawData += d;
         });
-        res.on('end', () => {
+        res.on("end", () => {
           resolve(<RequestResult>{
             message: res,
             data: rawData
@@ -122,9 +122,9 @@ export class Nettime {
         hostname: url.hostname,
         port: url.port,
         path: path,
-        method: 'POST',
+        method: "POST",
         headers: {
-          "Content-Type": 'application/x-www-form-urlencoded'
+          "Content-Type": "application/x-www-form-urlencoded"
         }
       };
       if (this.sessionCookie) {
@@ -136,10 +136,10 @@ export class Nettime {
 
       let req = https.request(options, (res: http.IncomingMessage) => {
         let rawData = "";
-        res.on('data', (d) => {
+        res.on("data", (d) => {
           rawData += d;
         });
-        res.on('end', () => {
+        res.on("end", () => {
           resolve(<RequestResult>{
             message: res,
             data: rawData
