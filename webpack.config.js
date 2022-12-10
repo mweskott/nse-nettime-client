@@ -1,4 +1,5 @@
 const path = require('path');
+const ShebangPlugin = require('webpack-shebang-plugin');
 
 module.exports = {
     entry: './src/cli.ts',
@@ -11,6 +12,9 @@ module.exports = {
             },
         ],
     },
+    plugins: [
+        new ShebangPlugin()
+    ],
     resolve: {
         extensions: ['.tsx', '.ts', '.js'],
     },
