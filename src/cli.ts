@@ -2,13 +2,13 @@
 
 import { Command } from "commander";
 import os = require("os");
-import * as prompt from "prompt-sync";
+import PromptSync from "prompt-sync";
 import { BookingCommand, BookingCommandData, BookingData, Configuration, ListCommand } from "./commands";
 import { JobsCommand } from "./commands/jobs-command";
 import {logger} from "./logger";
 
 function inputPassword(username: string) {
-  return prompt()(`enter password for user ${username}: `, {echo: "."});
+  return PromptSync()(`enter password for user ${username}: `, {echo: "."});
 }
 
 function getStartTime(interval: string): string {
