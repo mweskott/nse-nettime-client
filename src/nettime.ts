@@ -4,6 +4,7 @@ import * as http from "http";
 import * as https from "https";
 import querystring = require("querystring");
 import { URL } from "url";
+import { logger } from "./logger";
 
 export class OperationResult {
   public error: string;
@@ -27,8 +28,8 @@ export class Nettime {
   }
 
   public contact(): Promise<OperationResult> {
-    console.log("=================================================================");
-    console.log("contact");
+    logger.debug("=================================================================");
+    logger.debug("contact");
 
     return new Promise<OperationResult>((resolve, reject) => {
       this.get("/").then((res) => {
@@ -41,8 +42,8 @@ export class Nettime {
   }
 
   public login(user: string, password: string): Promise<OperationResult> {
-    console.log("=================================================================");
-    console.log("login");
+    logger.debug("=================================================================");
+    logger.debug("login");
 
     let data = {
       "F_Login": "Login",
@@ -64,8 +65,8 @@ export class Nettime {
   }
 
   public logout(): Promise<OperationResult> {
-    console.log("=================================================================");
-    console.log("logout");
+    logger.debug("=================================================================");
+    logger.debug("logout");
 
     return new Promise<OperationResult>((resolve, reject) => {
       this.get("/asp/nt_abmelden.asp").then((res) => {

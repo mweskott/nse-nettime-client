@@ -13,7 +13,7 @@
   },
   "scripts": {
     "build": "npm run test",
-    "test": "npm run compile && mocha ./dist/*.test.js",
+    "test": "npm run compile && mocha ./dist/*.spec.js",
     "compile": "tsc",
     "lint": "tslint -c tslint.json src/**/*.ts"
   },

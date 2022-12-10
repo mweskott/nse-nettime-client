@@ -3,6 +3,7 @@ import { Nettime, OperationResult } from '../nettime';
 import { ProjectSearchPage } from '../pages/project-search-page';
 import { UserSarchPage } from '../pages/user-search-page';
 import { Job } from '../model/job';
+import {logger} from "../logger";
 
 export class JobsCommand {
 
@@ -18,18 +19,18 @@ export class JobsCommand {
         try {
             await nettime.contact();
             await nettime.login(config.user, config.password);
-            console.log('=================================================================');
-            console.log('collecting jobs of user projects');
+            logger.debug('=================================================================');
+            logger.debug('collecting jobs of user projects');
             const userSearch = new UserSarchPage(nettime);
             const userId = await userSearch.getUserId(config.user);
             const jobs = await this.collectJobsAsync(nettime, userId);
-            console.log('-----------------------------------------------------------------');
-            console.log(`found ${jobs.length} jobs`);
-            jobs.forEach((job) => console.log(job.taskNumber.task, job.name));
+            logger.debug('-----------------------------------------------------------------');
+            logger.info(`found ${jobs.length} jobs`);
+            jobs.forEach((job) => logger.info(job.taskNumber.task, job.name));
 
         } catch (error) {
-            console.log('-----------------------------------------------------------------');
-            console.log('\x1b[1m\x1b[31m%s\x1b[0m', '... error', error);
+            logger.debug('-----------------------------------------------------------------');
+            logger.error('\x1b[1m\x1b[31m%s\x1b[0m', '... error', error);
         } finally {
             if (nettime.sessionCookie) {
                 await nettime.logout();

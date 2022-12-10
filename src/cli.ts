@@ -5,6 +5,7 @@ import os = require("os");
 import * as prompt from "prompt-sync";
 import { BookingCommand, BookingCommandData, BookingData, Configuration, ListCommand } from "./commands";
 import { JobsCommand } from "./commands/jobs-command";
+import {logger} from "./logger";
 
 function inputPassword(username: string) {
   return prompt()(`enter password for user ${username}: `, {echo: "."});
@@ -28,8 +29,9 @@ program
 
 program
   .command("book <task> <date> <intervals...>")
+    .option("-m, --message <message>", "Booking message")
   .description("submit booking")
-  .action(async (task: string, date: string, intervals: string[]) => {
+  .action(async (task: string, date: string, intervals: string[], bookingOptions: any) => {
     const config = Configuration.createConfigurationFromFile(program.opts().config);
     config.url = program.opts().url || config.url;
     config.user = program.opts().user || config.user || os.userInfo().username;
@@ -48,7 +50,8 @@ program
       booking.date = date;
       booking.timeStart = getStartTime(interval);
       booking.timeEnd = getEndTime(interval);
-      console.log(booking);
+      booking.message = bookingOptions.message || "";
+      logger.debug(booking);
       return booking;
     });
 

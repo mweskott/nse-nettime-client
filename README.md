@@ -10,7 +10,7 @@ Unofficial client for the NSE time recording tool powered by node.js.
 
 ## Command Line
 
-> `nettime --url https://nettime.nse.de -u testuser -p mysecret book 123213.23.33.01 15.03.2017 08:00-16:00`
+> `nettime --url https://nettime.nse.de -u testuser -p mysecret book 123213.23.33.01 15.03.2017 08:00-16:00 -m "meeting"`
 
 Use `nettime --help` to list all commands and options.
 

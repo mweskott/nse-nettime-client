@@ -4,6 +4,7 @@ import fs = require("fs");
 import path = require("path");
 import os = require("os");
 import * as readline from "readline";
+import {logger} from "./logger";
 
 export class Alias {
     [header: string]: string;
@@ -15,23 +16,23 @@ export class Configuration {
         let cfg = new Configuration();
         const configurationFile = filename || path.join(os.homedir(), ".nettime.json");
         if (!fs.existsSync(configurationFile)) {
-            console.log("no configuration file found at %s", configurationFile);
+            logger.error("no configuration file found at %s", configurationFile);
             return cfg;
         }
         try {
-            console.log("reading configuration from file %s", configurationFile);
+            logger.debug("reading configuration from file %s", configurationFile);
             const contents = fs.readFileSync(configurationFile);
             const fileConfiguration = JSON.parse(contents.toString());
             Object.assign(cfg, fileConfiguration);
         } catch (e) {
-            console.log("cannot read configuration file ", filename, e);
+            logger.error("cannot read configuration file ", filename, e);
         }
         return cfg;
     }
 
     public static writeConfigurationToFile(cfg: Configuration, filename: string) {
         const configurationFile = filename || path.join(os.homedir(), ".nettime.json");
-        console.log("writing configuration to file %s", configurationFile);
+        logger.info("writing configuration to file %s", configurationFile);
         fs.writeFileSync(configurationFile, JSON.stringify(cfg));
     }
 
@@ -60,6 +61,7 @@ export class BookingData {
     public date: string;
     public timeStart: string;
     public timeEnd: string;
+    public message: string;
 }
 
 // tslint:disable-next-line:max-classes-per-file
@@ -80,15 +82,17 @@ export class BookingCommand {
             for (const booking of bookingCommands.bookings) {
                 const resolvedTask = bookingCommands.config.resolveAlias(booking.task);
                 if (!!resolvedTask && !!booking.date && !!booking.timeStart && !!booking.timeEnd) {
+                    logger.info(`${booking.task} ${booking.date} ${booking.timeStart}-${booking.timeEnd} \"${booking.message}\"`);
                     const bookingPage = new ZeitkontierungPage(nettime);
-                    const bookingResult = await bookingPage.buchen(resolvedTask, booking.date, booking.timeStart, booking.timeEnd);
-                    console.log("-----------------------------------------------------------------");
-                    console.log("\x1b[32m%s\x1b[0m", "... OK");
+                    const bookingResult = await bookingPage.buchen(resolvedTask, booking.date,
+                        booking.timeStart, booking.timeEnd, booking.message);
+                    logger.debug("-----------------------------------------------------------------");
+                    logger.debug("\x1b[32m%s\x1b[0m", "... OK");
                 }
             }
         } catch (error) {
-            console.log("-----------------------------------------------------------------");
-            console.log("\x1b[1m\x1b[31m%s\x1b[0m", "... error", error);
+            logger.debug("-----------------------------------------------------------------");
+            logger.error("\x1b[1m\x1b[31m%s\x1b[0m", "... error", error);
         } finally {
             if (nettime.sessionCookie) {
                 await nettime.logout();
@@ -112,15 +116,15 @@ export class ListCommand {
             await nettime.login(config.user, config.password);
             let bookingPage = new ZeitkontierungPage(nettime);
             await bookingPage.ansicht();
-            console.log("-----------------------------------------------------------------");
+            logger.debug("-----------------------------------------------------------------");
             for(let booking of bookingPage.editableBookingList) {
-                console.log(booking);
+                logger.debug(booking);
             }
-            console.log(bookingPage.getTaskOverview());
+            logger.debug(bookingPage.getTaskOverview());
         }
         catch (error) {
-            console.log("-----------------------------------------------------------------");
-            console.log("\x1b[1m\x1b[31m%s\x1b[0m", "... error", error);
+            logger.debug("-----------------------------------------------------------------");
+            logger.error("\x1b[1m\x1b[31m%s\x1b[0m", "... error", error);
         }
         finally {
             if (nettime.sessionCookie) {

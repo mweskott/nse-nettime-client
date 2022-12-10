@@ -1,6 +1,7 @@
 import * as cheerio from "cheerio";
 import { Nettime, OperationResult } from "../nettime";
 import { TaskNumber } from "../task-number";
+import {logger} from "../logger";
 
 export class EditableBooking {
     public id: string;
@@ -32,11 +33,11 @@ export class ZeitkontierungPage {
     constructor(public nettime: Nettime) {
     }
 
-    public async buchen(target: string, date: string, timeStart: string, timeEnd: string): Promise<OperationResult> {
+    public async buchen(target: string, date: string, timeStart: string, timeEnd: string, message: string): Promise<OperationResult> {
         return new Promise<OperationResult>(async (resolve, reject) => {
             const bookingPage = await this.ansicht();
             await bookingPage.aktualisieren(target);
-            const htmlResponse = await bookingPage.speichern(target, date, timeStart, timeEnd);
+            const htmlResponse = await bookingPage.speichern(target, date, timeStart, timeEnd, message);
 
             if (htmlResponse.includes("Ihre Eingaben wurden erfolgreich gespeichert.")) {
                 return resolve({} as OperationResult);
@@ -54,8 +55,8 @@ export class ZeitkontierungPage {
     }
 
     public async ansicht() : Promise<ZeitkontierungPage> {
-        console.log("=================================================================");
-        console.log("ansicht");
+        logger.debug("=================================================================");
+        logger.debug("ansicht");
               
         return new Promise<ZeitkontierungPage>((resolve, reject) => {
             this.nettime.get("/asp/nt_zeitkontierung.asp").then((res) => {
@@ -129,8 +130,8 @@ export class ZeitkontierungPage {
     }
 
     public async aktualisieren(target: string) : Promise<ZeitkontierungPage> {
-        console.log("=================================================================");
-        console.log("aktualisieren");
+        logger.debug("=================================================================");
+        logger.debug("aktualisieren");
 
         let taskNumber = new TaskNumber(target);
 
@@ -147,9 +148,9 @@ export class ZeitkontierungPage {
         });
     }
 
-    public async speichern(target: string, date: string, timeStart: string, timeEnd: string) : Promise<string> {
-        console.log("=================================================================");
-        console.log("speichern");
+    public async speichern(target: string, date: string, timeStart: string, timeEnd: string, message: string) : Promise<string> {
+        logger.debug("=================================================================");
+        logger.debug("speichern");
 
         let taskNumber = new TaskNumber(target);
 
@@ -163,6 +164,7 @@ export class ZeitkontierungPage {
             "F_VonDat": date,
             "F_VonZeit": timeStart,
             "F_BisZeit": timeEnd,
+            "F_Text": message,
 
             // "F_Pausebuchen": "True",
             // "F_VonPause": "12:00",
@@ -176,7 +178,4 @@ export class ZeitkontierungPage {
             });
         });
     }
-
-
-
 }
