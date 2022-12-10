@@ -26,7 +26,7 @@ Use `nettime --help` to list all commands and options.
 To define static options, you can provide a configuration file in json format.
 If no configuration file is given, the command tries to load the user default configuration file `.nettime.json` from the user home directory.
 
-```javascript
+```json
 {
   "user": "mynettimeuser",
   "url": "https://nettime.example.org",
