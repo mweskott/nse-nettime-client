@@ -55,13 +55,13 @@ export class BookingCommandData {
     public bookings: BookingData[];
 }
 
-export class BookingData {
-    public config: Configuration;
-    public task: string;
-    public date: string;
-    public timeStart: string;
-    public timeEnd: string;
-    public message: string;
+export interface BookingData {
+    config: Configuration;
+    task: string;
+    date: string;
+    timeStart: string;
+    timeEnd: string;
+    message: string;
 }
 
 // tslint:disable-next-line:max-classes-per-file
@@ -81,22 +81,32 @@ export class BookingCommand {
             await nettime.login(bookingCommands.config.user, bookingCommands.config.password);
             for (const booking of bookingCommands.bookings) {
                 const resolvedTask = bookingCommands.config.resolveAlias(booking.task);
-                if (!!resolvedTask && !!booking.date && !!booking.timeStart && !!booking.timeEnd) {
-                    logger.info(`${booking.task} ${booking.date} ${booking.timeStart}-${booking.timeEnd} \"${booking.message}\"`);
-                    const bookingPage = new ZeitkontierungPage(nettime);
-                    const bookingResult = await bookingPage.buchen(resolvedTask, booking.date,
-                        booking.timeStart, booking.timeEnd, booking.message);
-                    logger.debug("-----------------------------------------------------------------");
-                    logger.debug("\x1b[32m%s\x1b[0m", "... OK");
-                }
+                await this.executeBookingOperation(resolvedTask, booking, nettime);
             }
         } catch (error) {
             logger.debug("-----------------------------------------------------------------");
-            logger.error("\x1b[1m\x1b[31m%s\x1b[0m", "... error", error);
+            logger.error("\x1b[1m\x1b[31m%s\x1b[0m", "... error", error.error);
         } finally {
             if (nettime.sessionCookie) {
                 await nettime.logout();
             }
+        }
+    }
+
+    private async executeBookingOperation(resolvedTask: string, booking: BookingData, nettime: Nettime) {
+        try {
+            logger.info(`booking operation: ${resolvedTask}(${booking.task}) ${booking.date} ${booking.timeStart}-${booking.timeEnd} \"${booking.message}\"`);
+            if (!!resolvedTask && !!booking.date && !!booking.timeStart && !!booking.timeEnd) {
+                const bookingPage = new ZeitkontierungPage(nettime);
+                const bookingResult = await bookingPage.buchen(resolvedTask, booking.date,
+                    booking.timeStart, booking.timeEnd, booking.message);
+                logger.debug("-----------------------------------------------------------------");
+                logger.debug("\x1b[32m%s\x1b[0m", "... OK");
+            } else {
+                logger.error("Error: booking operation not executed due to missing data!");
+            }
+        } catch (error) {
+            logger.error("Error in booking operation:", error.error);
         }
     }
 }
@@ -118,9 +128,9 @@ export class ListCommand {
             await bookingPage.ansicht();
             logger.debug("-----------------------------------------------------------------");
             for(let booking of bookingPage.editableBookingList) {
-                logger.debug(booking);
+                logger.info(booking);
             }
-            logger.debug(bookingPage.getTaskOverview());
+            logger.info(bookingPage.getTaskOverview());
         }
         catch (error) {
             logger.debug("-----------------------------------------------------------------");
