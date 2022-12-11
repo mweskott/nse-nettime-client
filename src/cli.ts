@@ -6,6 +6,7 @@ import PromptSync from "prompt-sync";
 import { BookingCommand, BookingCommandData, BookingData, Configuration, ListCommand } from "./commands";
 import { JobsCommand } from "./commands/jobs-command";
 import {logger} from "./logger";
+import {DayRange} from "./commands/day-range";
 
 function inputPassword(username: string) {
   return PromptSync()(`enter password for user ${username}: `, {echo: "."});
@@ -32,30 +33,31 @@ program
     .option("-m, --message <message>", "Booking message")
   .description("submit booking")
   .action(async (task: string, date: string, intervals: string[], bookingOptions: any) => {
-    const config = Configuration.createConfigurationFromFile(program.opts().config);
-    config.url = program.opts().url || config.url;
-    config.user = program.opts().user || config.user || os.userInfo().username;
-    config.password = program.opts().password || config.password;
+      try {
+          const config = Configuration.createConfigurationFromFile(program.opts().config);
+          config.url = program.opts().url || config.url;
+          config.user = program.opts().user || config.user || os.userInfo().username;
+          config.password = program.opts().password || config.password;
 
-    if (!config.password) {
-      config.password = inputPassword(config.user);
-    }
+          if (!config.password) {
+              config.password = inputPassword(config.user);
+          }
 
-    const commandData = new BookingCommandData();
-    commandData.config = config;
-    commandData.bookings = intervals.map((interval) => {
-      const booking = new BookingData();
-      booking.config = config;
-      booking.task = task;
-      booking.date = date;
-      booking.timeStart = getStartTime(interval);
-      booking.timeEnd = getEndTime(interval);
-      booking.message = bookingOptions.message || "";
-      logger.debug(booking);
-      return booking;
-    });
-
-    await new BookingCommand(commandData).run();
+          const commandData = new BookingCommandData();
+          commandData.config = config;
+          commandData.bookings = DayRange.parseDays(date).flatMap((day) =>
+              intervals.map((interval) => ({
+                      config, task,
+                      date: day,
+                      timeStart: getStartTime(interval),
+                      timeEnd: getEndTime(interval),
+                      message: bookingOptions.message || "",
+                  } as BookingData)
+              ));
+          await new BookingCommand(commandData).run();
+      } catch (error) {
+          logger.error("Error:", error.message || error.error);
+      }
   });
 
 program
