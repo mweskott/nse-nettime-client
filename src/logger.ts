@@ -23,10 +23,9 @@ class Logger {
 
     public error(message?: any, ...optionalParams: any[]) {
         if (this.level >= LogLevel.ERROR) {
-            console.log(message, ...optionalParams);
+            console.error(message, ...optionalParams);
         }
     }
-
 }
 
 export const logger = new Logger();
