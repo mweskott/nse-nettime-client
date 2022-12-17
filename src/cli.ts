@@ -1,12 +1,12 @@
 #!/usr/bin/env node
 
-import { Command } from "commander";
-import os = require("os");
+import {Command} from "commander";
 import PromptSync from "prompt-sync";
-import { BookingCommand, BookingCommandData, BookingData, Configuration, ListCommand } from "./commands";
-import { JobsCommand } from "./commands/jobs-command";
-import {logger} from "./logger";
+import {BookingCommand, BookingCommandData, BookingData, Configuration, ListCommand} from "./commands";
+import {JobsCommand} from "./commands/jobs-command";
+import {logger, LogLevel} from "./logger";
 import {DayRange} from "./commands/day-range";
+import os = require("os");
 
 function inputPassword(username: string) {
   return PromptSync()(`enter password for user ${username}: `, {echo: "."});
@@ -26,6 +26,7 @@ program
   .option("-u, --user <login>", "User login")
   .option("-p, --password <password>", "Password")
   .option("-c, --config <configFile>", "Configuration file")
+    .option("-v, --verbose", "verbose loggin")
     .option("--trace", "write server responses to files in current directory");
 
 program
@@ -33,6 +34,9 @@ program
     .option("-m, --message <message>", "Booking message")
   .description("submit booking")
   .action(async (task: string, date: string, intervals: string[], bookingOptions: any) => {
+      if (program.opts().verbose) {
+        logger.level = LogLevel.DEBUG;
+      }
       try {
           const config = Configuration.createConfigurationFromFile(program.opts().config);
           config.url = program.opts().url || config.url;
@@ -69,6 +73,9 @@ program
     config.user = program.opts().user || config.user;
     config.password = program.opts().password || config.password;
 
+      if (program.opts().verbose) {
+          logger.level = LogLevel.DEBUG;
+      }
     if (!config.password) {
       config.password = inputPassword(config.user);
     }
@@ -84,6 +91,9 @@ program
     config.user = program.opts().user || config.user;
     config.password = program.opts().password || config.password;
 
+      if (program.opts().verbose) {
+          logger.level = LogLevel.DEBUG;
+      }
     if (!config.password) {
       config.password = inputPassword(config.user);
     }

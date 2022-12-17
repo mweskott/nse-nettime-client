@@ -5,6 +5,8 @@ import * as https from "https";
 import querystring = require("querystring");
 import { URL } from "url";
 import { logger } from "./logger";
+import {AxiosResponse} from "axios";
+const axios = require("axios");
 
 export class OperationResult {
   public error: string;
@@ -15,14 +17,15 @@ export class OperationResult {
 }
 
 export class RequestResult {
-  public message: http.IncomingMessage;
+  // public message: http.IncomingMessage;
+  public message: string;
   public data: string;
 }
 
 // tslint:disable-next-line:max-classes-per-file
 export class Nettime {
 
-  public sessionCookie: string[];
+  public sessionCookie: string;
 
   constructor(public url: string, private tracing?: boolean | false) {
   }
@@ -33,10 +36,9 @@ export class Nettime {
 
     return new Promise<OperationResult>((resolve, reject) => {
       this.get("/").then((res) => {
-        this.sessionCookie = <string[]> res.message.headers["set-cookie"];
         resolve(new OperationResult());
       }).catch((result) => {
-        reject(new OperationResult("contact failed"));
+        reject(new OperationResult(`contact failed: ${result}`));
       });
     });
   }
@@ -86,69 +88,33 @@ export class Nettime {
   }
 
   public get(path: string): Promise<RequestResult> {
-
-    const url = new URL(this.url);
-    return new Promise<RequestResult>((resolve, reject) => {
-      const options: http.RequestOptions = {
-        hostname: url.hostname,
-        port: url.port,
-        path: path,
-        method: "GET",
-        headers: {}
-      };
-      if (this.sessionCookie) {
-        options.headers["Cookie"] = this.sessionCookie;
+    return axios.get(path,{
+      baseURL: this.url,
+      headers: { Cookie: this.sessionCookie },
+      responseType: 'arraybuffer',
+      reponseEncoding: 'binary'
+    })
+    .then((response: AxiosResponse) => {
+      const cookies = response.headers["set-cookie"];
+      if (cookies) {
+        this.sessionCookie = cookies[0].split("; ")[0];
       }
-
-      let req = https.request(options, (res: http.IncomingMessage) => {
-        let rawData = "";
-        res.on("data", (d) => {
-          rawData += d;
-        });
-        res.on("end", () => {
-          resolve(<RequestResult>{
-            message: res,
-            data: rawData
-          });
-        });
-      });
-      req.end();
+      const decoder = new TextDecoder("ISO-8859-1");
+      const html = decoder.decode(response.data);
+      return {data: html} as RequestResult;
     });
   }
 
   public post(path: string, data: any): Promise<RequestResult> {
-    return new Promise<RequestResult>((resolve, reject) => {
-      let url = new URL(this.url);
-      let options: http.RequestOptions = {
-        hostname: url.hostname,
-        port: url.port,
-        path: path,
-        method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded"
-        }
-      };
-      if (this.sessionCookie) {
-        options.headers["Cookie"] = this.sessionCookie;
-      }
-      let encodedData = querystring.stringify(data);
-
-      options.headers["Content-Length"] = Buffer.byteLength(encodedData);
-
-      let req = https.request(options, (res: http.IncomingMessage) => {
-        let rawData = "";
-        res.on("data", (d) => {
-          rawData += d;
+    return axios.post(path, data,{
+      baseURL: this.url,
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Cookie": this.sessionCookie,
+      },
+    })
+        .then((response: AxiosResponse) => {
+          return {data: response.data} as RequestResult;
         });
-        res.on("end", () => {
-          resolve(<RequestResult>{
-            message: res,
-            data: rawData
-          });
-        });
-      });
-      req.write(encodedData);
-      req.end();
-    });
   }
 }
